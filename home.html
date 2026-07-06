@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Encontre Profissionais</title>
+    <!-- Font Awesome para Ícones Modernos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --star-gold: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 80px; /* Espaço para menu inferior se necessário no futuro */
+        }
+
+        /* --- TOPO AZUL E PESQUISA --- */
+        .header-section {
+            background-color: var(--primary-blue);
+            padding: 24px 20px 30px 20px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            color: white;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .location-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .location-container i {
+            color: var(--secondary-orange);
+            font-size: 18px;
+        }
+
+        .location-text p {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .location-text h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .notification-btn {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-btn .badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary-orange);
+            border-radius: 50%;
+        }
+
+        /* Barra de Pesquisa */
+        .search-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box {
+            flex-grow: 1;
+            background-color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box i {
+            color: var(--text-gray);
+            margin-right: 10px;
+        }
+
+        .search-box input {
+            border: none;
+            width: 100%;
+            height: 46px;
+            font-size: 14px;
+            outline: none;
+            color: var(--text-dark);
+        }
+
+        .filter-btn {
+            width: 46px;
+            height: 46px;
+            background-color: var(--secondary-orange);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 138, 0, 0.3);
+        }
+
+        /* Tags rápidas de Filtros (Filtros Ativos) */
+        .filter-tags-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 12px 20px;
+            white-space: nowrap;
+        }
+
+        .filter-tags-scroll::-webkit-scrollbar { display: none; }
+
+        .tag-pill {
+            background-color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-gray);
+            border: 1px solid var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .tag-pill.active {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* --- BANNER ROTATIVO (SLIDER) --- */
+        .banner-section {
+            padding: 0 20px;
+            margin-bottom: 25px;
+        }
+
+        .banner-container {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(10, 57, 138, 0.15);
+        }
+
+        .banner-content h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            max-width: 60%;
+        }
+
+        .banner-content p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 12px;
+        }
+
+        .banner-btn {
+            background-color: var(--secondary-orange);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .banner-dots {
+            display: flex;
+            gap: 4px;
+            position: absolute;
+            bottom: 12px;
+            right: 20px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+        }
+
+        .dot.active {
+            background-color: var(--secondary-orange);
+            width: 14px;
+            border-radius: 10px;
+        }
+
+        /* --- SEÇÕES PADRÃO (TÍTULOS) --- */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 12px 20px;
+        }
+
+        .section-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .section-header a {
+            font-size: 13px;
+            color: var(--secondary-orange);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* --- CATEGORIAS EM CARTÕES --- */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background-color: white;
+            border-radius: 14px;
+            padding: 12px 6px;
+            text-align: center;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+
+        .category-card:active {
+            transform: scale(0.95);
+        }
+
+        .category-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background-color: rgba(10, 57, 138, 0.06);
+            color: var(--primary-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 8px auto;
+            font-size: 18px;
+        }
+
+        /* Cores alternadas sutis para dinamismo */
+        .category-card:nth-child(2n) .category-icon-box {
+            background-color: rgba(255, 138, 0, 0.06);
+            color: var(--secondary-orange);
+        }
+
+        .category-card span {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- CARROUSÉIS DE PROFISSIONAIS H-SCROLL --- */
+        .horizontal-scroll-container {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding: 0 20px 20px 20px;
+            margin-bottom: 15px;
+        }
+
+        .horizontal-scroll-container::-webkit-scrollbar { display: none; }
+
+        .pro-card {
+            background-color: white;
+            border-radius: 16px;
+            width: 160px;
+            padding: 14px;
+            flex-shrink: 0;
+            border: 1px solid var(--border-color);
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .pro-avatar-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px auto;
+            position: relative;
+        }
+
+        .pro-avatar-box img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Indicador Online */
+        .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success-green);
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .pro-info {
+            text-align: center;
+        }
+
+        .pro-info h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pro-info p.job-title {
+            font-size: 11px;
+            color: var(--secondary-orange);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .pro-info p.location-label {
+            font-size: 11px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pro-rating {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dark);
+            background-color: #FEF3C7;
+            padding: 3px 8px;
+            border-radius: 20px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .pro-rating i {
+            color: var(--star-gold);
+        }
+
+        /* Distintivo para novos profissionais */
+        .badge-new {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--primary-blue);
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+
+
+
+
+
+
+
+
+
+        /* Esconde do 5º cartão em diante quando estiver em modo colapsado */
+.categories-grid.collapsed .category-card:nth-child(n+5) {
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Container que agrupa os 3 ícones à direita */
+.right-actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Espaço entre os ícones */
+}
+
+/* Estilo padronizado para os botões de ação redondos */
+.action-icon-btn {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.action-icon-btn:active {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* O pequeno ponto laranja de notificações novas */
+.action-icon-btn .badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--secondary-orange);
+    border-radius: 50%;
+}
+
+/* Cor especial opcional para o botão de sair ao clicar */
+.action-icon-btn.logout-btn:active {
+    background-color: rgba(239, 68, 68, 0.3); /* Tom avermelhado sutil */
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+
+
+/* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. TOPO: Pesquisa, Localização e Notificações -->
+    <div class="header-section">
+        <div class="top-bar">
+    <!-- Bloco da Localização -->
+    <div class="location-container">
+        <i class="fa-solid fa-location-dot"></i>
+        <div class="location-text">
+            <p>Localização Atual</p>
+            <h4>Luanda, Maianga</h4>
+        </div>
+        <i class="fa-solid fa-chevron-down" style="font-size: 10px; opacity: 0.8;"></i>
+    </div>
+    
+    <!-- Bloco de Ações do Lado Direito -->
+    <div class="right-actions-wrapper">
+        <!-- Ícone de Notificações -->
+        <div class="action-icon-btn" onclick="goToNotifications()" title="Notificações">
+            <i class="fa-solid fa-bell"></i>
+            <div class="badge"></div>
+        </div>
+
+        <!-- Ícone de Configurações -->
+        <div class="action-icon-btn" onclick="window.location.href='configuracoes-cliente.html'" title="Configurações">
+            <i class="fa-solid fa-gear"></i>
+        </div>
+
+        <!-- Ícone de Sair (Logout) -->
+        <div class="action-icon-btn logout-btn" onclick="handleLogout()" title="Sair">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </div>
+    </div>
+</div>
+
+
+
+
+        <!-- Barra de Busca Avançada -->
+        <div class="search-wrapper">
+            <div class="search-box" style="position: relative; display: flex; align-items: center;">
+    <!-- Ícone de Lupa à Esquerda -->
+    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 16px; color: #64748B;"></i>
+    
+    <!-- Input de Texto com Padding Ajustado à Direita -->
+    <input type="text" id="mainSearchInput" placeholder="Buscar pedreiro, Maianga, nome..." 
+           style="width: 100%; padding: 14px 50px 14px 44px; border-radius: 12px; border: 1px solid #E2E8F0; outline: none; font-size: 14px;">
+    
+    <!-- Botão de Pesquisa no Canto Direito -->
+    <button onclick="executeSearch()" 
+            style="position: absolute; right: 8px; background-color: #0A398A; color: white; border: none; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background-color 0.2s;">
+        <i class="fa-solid fa-arrow-right"></i>
+    </button>
+</div>
+            <button class="filter-btn" onclick="toggleFiltrosVisuais()">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros Requisitados horizontais -->
+    <div class="filter-tags-scroll">
+        <div class="tag-pill active" onclick="toggleTag(this)"><i class="fa-solid fa-person-walking"></i> Mais Próximo</div>
+        <div class="tag-pill" onclick="toggleTag(this)"><i class="fa-solid fa-bolt"></i> Disponível agora</div>
+        <div class="tag-pill" onclick="toggleTag(this)"><i class="fa-solid fa-star"></i> Avaliação</div>
+        <div class="tag-pill" onclick="toggleTag(this)"><i class="fa-solid fa-route"></i> Distância</div>
+    </div>
+
+    <!-- 2. BANNER ROTATIVO -->
+    <div class="banner-section">
+        <div class="banner-container">
+            <div class="banner-content">
+                <h3>Precisa de reparações em casa?</h3>
+                <p>Profissionais verificados a menos de 5km de si.</p>
+                <button class="banner-btn">Chamar Agora</button>
+            </div>
+            <div class="banner-dots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. CATEGORIAS EM CARTÕES (15 Itens Solicitados) -->
+<div class="section-header">
+    <h3>Categorias</h3>
+    <!-- Alterado para disparar a função JS -->
+    <a href="#" id="btnToggleCategories" onclick="toggleCategories(event)">Ver mais</a>
+</div>
+
+<!-- Adicionada a classe 'collapsed' por padrão -->
+<div class="categories-grid collapsed" id="categoriesGrid">
+    <div class="category-card" onclick="filterByCategory('Pedreiro')">
+        <div class="category-icon-box"><i class="fa-solid fa-trowel-bricks"></i></div>
+        <span>Pedreiro</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Eletricista')">
+        <div class="category-icon-box"><i class="fa-solid fa-bolt"></i></div>
+        <span>Eletricista</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Canalizador')">
+        <div class="category-icon-box"><i class="fa-solid fa-faucet-drip"></i></div>
+        <span>Canalizador</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Carpinteiro')">
+        <div class="category-icon-box"><i class="fa-solid fa-hammer"></i></div>
+        <span>Carpinteiro</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Pintor')">
+        <div class="category-icon-box"><i class="fa-solid fa-paint-roller"></i></div>
+        <span>Pintor</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Fotógrafo')">
+        <div class="category-icon-box"><i class="fa-solid fa-camera"></i></div>
+        <span>Fotógrafo</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Designer')">
+        <div class="category-icon-box"><i class="fa-solid fa-compass-drafting"></i></div>
+        <span>Designer</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Cabeleireiro')">
+        <div class="category-icon-box"><i class="fa-solid fa-scissors"></i></div>
+        <span>Cabeleireiro</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Maquilhador')">
+        <div class="category-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <span>Maquilhador</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Decoradora')">
+        <div class="category-icon-box"><i class="fa-solid fa-couch"></i></div>
+        <span>Decoradora</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('DJ')">
+        <div class="category-icon-box"><i class="fa-solid fa-compact-disc"></i></div>
+        <span>DJ</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Mecânico')">
+        <div class="category-icon-box"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <span>Mecânico</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Téc. Informática')">
+        <div class="category-icon-box"><i class="fa-solid fa-laptop-code"></i></div>
+        <span>Téc. Informática</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Costureira')">
+        <div class="category-icon-box"><i class="fa-solid fa-shirt"></i></div>
+        <span>Costureira</span>
+    </div>
+    <div class="category-card" onclick="filterByCategory('Jardineiro')">
+        <div class="category-icon-box"><i class="fa-solid fa-seedling"></i></div>
+        <span>Jardineiro</span>
+    </div>
+</div>
+
+    <!-- 4. PROFISSIONAIS EM DESTAQUE -->
+    <div class="section-header">
+        <h3>Profissionais em Destaque</h3>
+        <a href="#">Ver mais</a>
+    </div>
+    <div class="horizontal-scroll-container">
+        <!-- Pro Card 1 -->
+        <div class="pro-card" onclick="abrirPerfilProfissional()" style="cursor:pointer;">
+            <div class="pro-avatar-box">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Avatar">
+                <div class="status-dot"></div>
+            </div>
+            <div class="pro-info">
+                <h4>Sandra Silva</h4>
+                <p class="job-title">Maquilhadora</p>
+                <p class="location-label">Viana, Luanda</p>
+                <div class="pro-rating">
+                    <i class="fa-solid fa-star"></i> 4.9
+                </div>
+            </div>
+        </div>
+        <!-- Pro Card 2 -->
+        <div class="pro-card" onclick="abrirPerfilProfissional()" style="cursor:pointer;">
+            <div class="pro-avatar-box">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="Avatar">
+                <div class="status-dot"></div>
+            </div>
+            <div class="pro-info">
+                <h4>António Nzage</h4>
+                <p class="job-title">Eletricista</p>
+                <p class="location-label">Talatona, Luanda</p>
+                <div class="pro-rating">
+                    <i class="fa-solid fa-star"></i> 4.8
+                </div>
+            </div>
+        </div>
+        <!-- Pro Card 3 -->
+        <div class="pro-card" onclick="abrirPerfilProfissional()" style="cursor:pointer;">
+            <div class="pro-avatar-box">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150" alt="Avatar">
+                <div class="status-dot"></div>
+            </div>
+            <div class="pro-info">
+                <h4>Paulo Pinheiro</h4>
+                <p class="job-title">Produtor</p>
+                <p class="location-label">Viana, Luanda</p>
+                <div class="pro-rating">
+                    <i class="fa-solid fa-star"></i> 4.5
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. NOVOS PROFISSIONAIS -->
+    <div class="section-header">
+        <h3>Novos Profissionais</h3>
+        <a href="#">Ver mais</a>
+    </div>
+    <div class="horizontal-scroll-container">
+        <!-- Novo Pro Card 1 -->
+        <div class="pro-card" onclick="abrirPerfilProfissional()" style="cursor:pointer;">
+            <div class="badge-new">Novo</div>
+            <div class="pro-avatar-box">
+                <img src="https://images.unsplash.com/photo-1621574539437-4b7cb63120b8?w=150" alt="Avatar">
+            </div>
+            <div class="pro-info">
+                <h4>Carlos Banza</h4>
+                <p class="job-title">Mecânico</p>
+                <p class="location-label">Belas, Luanda</p>
+                <div class="pro-rating">
+                    <i class="fa-solid fa-star"></i> 0.0
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. MAIS BEM AVALIADOS -->
+    <div class="section-header">
+        <h3>Mais bem Avaliados</h3>
+        <a href="#">Ver mais</a>
+    </div>
+    <div class="horizontal-scroll-container">
+        <!-- Top Rated Card 1 -->
+        <div class="pro-card" onclick="abrirPerfilProfissional()" style="cursor:pointer;">
+            <div class="pro-avatar-box">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150" alt="Avatar">
+                <div class="status-dot"></div>
+            </div>
+            <div class="pro-info">
+                <h4>Eliana Costa</h4>
+                <p class="job-title">Decoradora</p>
+                <p class="location-label">Kilamba, Luanda</p>
+                <div class="pro-rating">
+                    <i class="fa-solid fa-star"></i> 5.0
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+        <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home.html" class="nav-item-tab active">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pesquisa.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Lista</span>
+        </a>
+        <a href="historico.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Histórico</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-cliente.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Função para ativar/desativar as tags rápidas dos filtros solicitados
+        function toggleTag(element) {
+            element.classList.toggle('active');
+        }
+
+        // Lógica explicativa da barra de pesquisa multicritério
+        document.getElementById('mainSearchInput').addEventListener('input', function(e) {
+            let termo = e.target.value.toLowerCase();
+            console.log("Pesquisando por nome, profissão, bairro, município ou província: ", termo);
+            // Aqui ligarás o mecanismo de busca (Ajax / Fetch API) filtrando os dados dinamicamente.
+        });
+    </script>
+
+
+
+<script>
+
+
+function toggleCategories(event) {
+    event.preventDefault(); // Evita que a página salte para o topo ao clicar
+
+    const grid = document.getElementById('categoriesGrid');
+    const btn = document.getElementById('btnToggleCategories');
+
+    // Alterna a classe 'collapsed' (se tem, remove; se não tem, adiciona)
+    grid.classList.toggle('collapsed');
+
+    // Verifica o estado atual para mudar o texto do botão
+    if (grid.classList.contains('collapsed')) {
+        btn.textContent = 'Ver mais';
+    } else {
+        btn.textContent = 'Ver menos';
+    }
+}
+
+
+</script>
+
+
+
+
+
+
+
+
+<script>
+
+
+// Redireciona para as Notificações
+function goToNotifications() {
+    window.location.href = 'notificacoes.html';
+}
+
+// Redireciona para o Perfil do Cliente
+function goToProfile() {
+    window.location.href = 'perfil-cliente.html';
+}
+
+// Confirmação e Saída segura da conta
+function handleLogout() {
+    // Exibe a caixa de confirmação nativa do navegador/telemóvel
+    const certeza = confirm("Tem certeza que deseja sair do aplicativo?");
+    
+    if (certeza) {
+        // Se clicar em 'Sim' / 'OK'
+        window.location.href = 'login.html';
+    }
+    // Se clicar em 'Cancelar', não faz nada e o utilizador continua na página inicial
+}
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+function executeSearch() {
+    const query = document.getElementById('mainSearchInput').value.trim();
+    
+    // Opcional: Podes passar o termo pesquisado via URL se quiseres ler na página de destino
+    if (query !== "") {
+        window.location.href = `pesquisa.html?busca=${encodeURIComponent(query)}`;
+    } else {
+        window.location.href = 'pesquisa.html';
+    }
+}
+
+// Permite executar a pesquisa ao carregar na tecla "Enter" dentro do input
+document.getElementById('mainSearchInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        executeSearch();
+    }
+});
+
+
+
+</script>
+
+
+
+
+
+<script>
+
+
+function filterByCategory(profession) {
+    window.location.href = `pesquisa.html?busca=${encodeURIComponent(profession)}`;
+}
+
+
+</script>
+
+
+
+
+
+
+
+<script>
+function abrirPerfilProfissional() {
+    window.location.href = "perfil-profissional-no-cliente.html";
+}
+</script>
+
+
+
+</body>
+</html>

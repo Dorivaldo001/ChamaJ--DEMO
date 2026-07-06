@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Favoritos</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --star-gold: #FFB800;
+            --danger-red: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 30px;
+        }
+
+        /* --- NAVEGAÇÃO SUPERIOR --- */
+        .top-nav-bar {
+            background-color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--text-dark);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .top-nav-bar h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* --- LISTA DE FAVORITOS --- */
+        .favorites-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .pro-fav-card {
+            background-color: white;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.01);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .pro-fav-card:active {
+            transform: scale(0.98);
+        }
+
+        .pro-fav-card img {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .pro-fav-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .pro-fav-details h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .pro-fav-details p.category {
+            font-size: 12px;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        /* Avaliação por estrelas */
+        .rating-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .rating-box i {
+            color: var(--star-gold);
+        }
+
+        .rating-box span.reviews-count {
+            color: var(--text-gray);
+            font-weight: 400;
+        }
+
+        /* Botão União: Remover dos Favoritos (Coração Partido) */
+        .btn-remove-fav {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--danger-red);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Estado da lista vazia */
+        .empty-state-box {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 40px;
+            color: var(--text-gray);
+            gap: 12px;
+        }
+
+        .empty-state-box i {
+            font-size: 48px;
+            color: var(--border-color);
+        }
+
+        .empty-state-box p {
+            font-size: 14px;
+        }
+
+
+
+
+
+
+
+/* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Navegação Superior -->
+    <div class="top-nav-bar">
+        <a href="perfil-cliente.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h2>Profissionais Salvos</h2>
+    </div>
+
+    <!-- Container dos Favoritos -->
+    <div class="favorites-container" id="favsContainer">
+        
+        <!-- Cartão Favorito 1 -->
+        <div class="pro-fav-card" id="fav-pro-01">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="António" onclick="goToProfile()">
+            <div class="pro-fav-details" onclick="goToProfile()">
+                <h3>António Nzage</h3>
+                <p class="category">Eletricista Geral</p>
+                <div class="rating-box">
+                    <i class="fa-solid fa-star"></i>
+                    <span>4.9</span>
+                    <span class="reviews-count">(42 avaliações)</span>
+                </div>
+            </div>
+            <!-- Ação: Remover -->
+            <button class="btn-remove-fav" onclick="removeFavorite('fav-pro-01', 'António Nzage')" title="Remover dos favoritos">
+                <i class="fa-solid fa-heart"></i>
+            </button>
+        </div>
+
+        <!-- Cartão Favorito 2 -->
+        <div class="pro-fav-card" id="fav-pro-02">
+            <img src="https://images.unsplash.com/photo-1621905252507-b354bc25edac?w=150" alt="Carlos" onclick="goToProfile()">
+            <div class="pro-fav-details" onclick="goToProfile()">
+                <h3>Carlos Manuel</h3>
+                <p class="category">Técnico de Climatização</p>
+                <div class="rating-box">
+                    <i class="fa-solid fa-star"></i>
+                    <span>4.7</span>
+                    <span class="reviews-count">(19 avaliações)</span>
+                </div>
+            </div>
+            <!-- Ação: Remover -->
+            <button class="btn-remove-fav" onclick="removeFavorite('fav-pro-02', 'Carlos Manuel')" title="Remover dos favoritos">
+                <i class="fa-solid fa-heart"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Mensagem de Lista Vazia Oculta por padrão -->
+    <div class="empty-state-box" id="emptyState">
+        <i class="fa-solid fa-heart-crack"></i>
+        <h3>Nenhum profissional salvo</h3>
+        <p>Explore as categorias na página inicial e guarde os seus profissionais favoritos para os encontrar mais facilmente.</p>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pesquisa.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Lista</span>
+        </a>
+        <a href="agenda.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-cliente.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Função para remover elemento de favoritos com animação suave
+        function removeFavorite(id, name) {
+            const card = document.getElementById(id);
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                
+                setTimeout(() => {
+                    card.remove();
+                    checkEmptyState();
+                }, 200);
+            }
+        }
+
+        // Verifica se a lista ficou vazia para mostrar o aviso
+        function checkEmptyState() {
+            const container = document.getElementById('favsContainer');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Se não restarem cartões de profissionais
+            if (container.children.length === 0) {
+                emptyState.style.display = 'flex';
+                container.style.display = 'none';
+            }
+        }
+
+        // Navegação simulada para o perfil do profissional
+        function goToProfile() {
+            window.location.href = 'perfil-profissional-no-cliente.html';
+        }
+    </script>
+</body>
+</html>

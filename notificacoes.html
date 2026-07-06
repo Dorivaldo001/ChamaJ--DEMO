@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Notificações</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --star-gold: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 30px;
+        }
+
+        /* --- NAVEGAÇÃO SUPERIOR --- */
+        .top-nav-bar {
+            background-color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .left-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            color: var(--text-dark);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .top-nav-bar h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .clear-all-btn {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* --- LISTA DE NOTIFICAÇÕES --- */
+        .notifications-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .notification-card {
+            background-color: white;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.01);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-card:active {
+            background-color: #F1F5F9;
+        }
+
+        /* Indicador visual de não lida (Ponto Laranja Escondível) */
+        .notification-card.unread::after {
+            content: '';
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary-orange);
+            border-radius: 50%;
+        }
+
+        /* Envoltório dos Ícones Temáticos */
+        .noti-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        /* Variações de Cores por Tipo de Notificação */
+        .icon-pedido { background-color: rgba(255, 138, 0, 0.1); color: var(--secondary-orange); }
+        .icon-mensagem { background-color: rgba(10, 57, 138, 0.1); color: var(--primary-blue); }
+        .icon-avaliacao { background-color: rgba(245, 158, 11, 0.1); color: var(--star-gold); }
+        .icon-confirmado { background-color: rgba(16, 185, 129, 0.1); color: var(--success-green); }
+
+        /* Conteúdo do Texto */
+        .noti-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-right: 12px;
+        }
+
+        .noti-details h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .noti-details p {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.4;
+        }
+
+        .noti-details span.time-ago {
+            font-size: 11px;
+            color: #94A3B8;
+            margin-top: 2px;
+        }
+
+        /* Estado da lista vazia */
+        .empty-notifications {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-gray);
+            gap: 12px;
+        }
+
+        .empty-notifications i {
+            font-size: 48px;
+            color: var(--border-color);
+        }
+
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Navegação Superior -->
+    <div class="top-nav-bar">
+        <div class="left-nav-group">
+            <h2>Notificações</h2>
+        </div>
+        <button class="clear-all-btn" onclick="clearAllNotifications()">Limpar tudo</button>
+    </div>
+
+    <!-- Lista de Notificações -->
+    <div class="notifications-container" id="notificationsBox">
+        
+        <!-- 1. Novo Pedido -->
+        <div class="notification-card unread" onclick="navigateNotification('pedidos-profissional.html', this)">
+            <div class="noti-icon-box icon-pedido">
+                <i class="fa-solid fa-file-invoice"></i>
+            </div>
+            <div class="noti-details">
+                <h3>Novo Pedido Recebido</h3>
+                <p>Sandra Silva enviou uma solicitação de serviço elétrico para a Maianga.</p>
+                <span class="time-ago">Há 2 min</span>
+            </div>
+        </div>
+
+        <!-- 2. Nova Mensagem -->
+        <div class="notification-card unread" onclick="navigateNotification('chat.html', this)">
+            <div class="noti-icon-box icon-mensagem">
+                <i class="fa-solid fa-comment-dots"></i>
+            </div>
+            <div class="noti-details">
+                <h3>Nova Mensagem</h3>
+                <p>António Nzage: "Olá! O orçamento fica pronto em 20 minutos."</p>
+                <span class="time-ago">Há 8 min</span>
+            </div>
+        </div>
+
+        <!-- 3. Nova Avaliação -->
+        <div class="notification-card" onclick="navigateNotification('avaliacoes-profissional.html', this)">
+            <div class="noti-icon-box icon-avaliacao">
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="noti-details">
+                <h3>Nova Avaliação Recebida</h3>
+                <p>Sandra Silva deixou uma avaliação de 5 estrelas no seu perfil.</p>
+                <span class="time-ago">Há 1 hora</span>
+            </div>
+        </div>
+
+        <!-- 4. Serviço Confirmado -->
+        <div class="notification-card" onclick="navigateNotification('agenda.html', this)">
+            <div class="noti-icon-box icon-confirmado">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="noti-details">
+                <h3>Serviço Confirmado</h3>
+                <p>O agendamento com Marcos Paulo para o dia 08/07 foi confirmado com sucesso.</p>
+                <span class="time-ago">Há 3 horas</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Feedback Visual Descartável para Lista Vazia -->
+    <div class="empty-notifications" id="emptyState">
+        <i class="fa-regular fa-bell-slash"></i>
+        <h3>Tudo em dia!</h3>
+        <p>Não tens nenhuma notificação nova para apresentar de momento.</p>
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pedidos-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Pedidos</span>
+        </a>
+        <a href="agenda.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Ao clicar, remove a marca de "não lida" e redireciona
+        function navigateNotification(url, cardElement) {
+            cardElement.classList.remove('unread');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 150);
+        }
+
+        // Limpa a lista por completo
+        function clearAllNotifications() {
+            const caixa = document.getElementById('notificationsBox');
+            const aviso = document.getElementById('emptyState');
+            
+            if (confirm("Tens a certeza que desejas remover todas as notificações?")) {
+                caixa.style.display = 'none';
+                caixa.innerHTML = '';
+                aviso.style.display = 'flex';
+            }
+        }
+    </script>
+</body>
+</html>

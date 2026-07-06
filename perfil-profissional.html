@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Perfil do Profissional</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --star-gold: #F59E0B;
+            --whatsapp-green: #25D366;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 40px;
+        }
+
+        /* --- TOPO E BOTÃO DE VOLTAR --- */
+        .profile-header-nav {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .nav-circle-btn {
+            width: 42px;
+            height: 42px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+
+        /* --- FOTO GRANDE DE CAPA/AVATAR --- */
+        .hero-profile-banner {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background-color: var(--primary-blue);
+        }
+
+        .hero-profile-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-profile-banner::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(to top, rgba(248, 250, 252, 1) 10%, rgba(248, 250, 252, 0) 100%);
+        }
+
+        /* --- CONTEÚDO PRINCIPAL (CARD DE DADOS) --- */
+        .profile-content-card {
+            background-color: white;
+            border-radius: 24px;
+            margin: -40px 20px 24px 20px;
+            padding: 24px 20px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            text-align: center;
+        }
+
+        /* Nome e Especialidade */
+        .profile-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .profile-specialty {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--secondary-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        /* Bloco de Avaliação (Estrelas) */
+        .profile-rating-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #FEF3C7;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .profile-rating-badge i {
+            color: var(--star-gold);
+        }
+
+        .profile-rating-badge span.review-count {
+            color: var(--text-gray);
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        /* Dados de Contacto e Localização */
+        .info-meta-list {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .meta-item i {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background-color: rgba(10, 57, 138, 0.06);
+            color: var(--primary-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        /* Variação especial para o ícone do WhatsApp */
+        .meta-item i.fa-whatsapp {
+            background-color: rgba(37, 211, 102, 0.1);
+            color: var(--whatsapp-green);
+        }
+
+        .meta-item span.label {
+            color: var(--text-gray);
+            font-size: 12px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .meta-data-text {
+            font-weight: 500;
+        }
+
+        /* --- BOTÕES DE AÇÃO --- */
+        .actions-grid-container {
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-action-primary {
+            width: 100%;
+            height: 54px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(10, 57, 138, 0.15);
+            transition: all 0.2s;
+        }
+
+        /* Ligar (Azul Principal) */
+        .btn-call {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        .btn-call:active { background-color: var(--primary-dark); }
+
+        /* Mensagem (Laranja) */
+        .btn-message {
+            background-color: var(--secondary-orange);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 138, 0, 0.2);
+        }
+        .btn-message:active { background-color: #E27B00; }
+
+        /* Favoritar (Secundário/Borda) */
+        .btn-favorite {
+            background-color: white;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+        .btn-favorite:active { background-color: #F1F5F9; }
+        
+        .btn-favorite.active i {
+            color: #EF4444; /* Cor de coração ativo */
+            animation: pulseHeart 0.3s ease;
+        }
+
+        @keyframes pulseHeart {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+
+        body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+
+
+
+
+
+
+
+
+
+/* --- MODAL DE PARTILHA (BOTTOM SHEET EFFECT) --- */
+.share-modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none; /* Escondido por padrão */
+    align-items: flex-end; /* Alinha o cartão ao fundo no mobile */
+}
+
+.share-modal-card {
+    background-color: white;
+    width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.share-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.share-modal-header h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E293B;
+}
+
+.close-modal-btn {
+    background: #F1F5F9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #64748B;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.qr-code-box {
+    text-align: center;
+    padding: 10px 0 20px 0;
+    border-bottom: 1px solid #E2E8F0;
+    margin-bottom: 20px;
+}
+
+.qr-code-box img {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 10px;
+    border: 1px solid #E2E8F0;
+    padding: 6px;
+    border-radius: 12px;
+}
+
+.qr-code-box p {
+    font-size: 12px;
+    color: #64748B;
+}
+
+/* Grelha de botões de ação */
+.share-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding-bottom: 10px;
+}
+
+.share-action-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.share-action-item span {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1E293B;
+}
+
+.action-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #F1F5F9;
+    color: #0A398A;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+}
+
+.action-icon-circle-orange {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: rgba(255, 138, 0, 0.1);
+    color: #FF8A00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+}
+
+
+
+
+
+
+
+
+
+.verified-badge{
+    color: #1D9BF0; /* Azul de verificação */
+    font-size: 18px;
+}
+
+
+
+
+
+
+.profile-rating-badge p{
+    margin: 6px 0 0;
+    padding: 3px 8px;
+    color: #dc2626;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+/* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+
+
+        
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <!-- Navegação Superior Flutuante -->
+    <div class="profile-header-nav">
+        <a href="home-profissional.html" class="nav-circle-btn" title="Voltar">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <button class="nav-circle-btn" onclick="shareProfile()" title="Partilhar">
+            <i class="fa-solid fa-share-nodes"></i>
+        </button>
+    </div>
+
+    <!-- 1. Foto Grande -->
+    <div class="hero-profile-banner">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600" alt="Foto do Profissional">
+    </div>
+
+    <!-- 2. Detalhes Corporativos -->
+    <div class="profile-content-card">
+        <!-- Nome e Especialidade -->
+        <div class="profile-name-wrapper">
+            <h2 class="profile-name">
+                António Nzage
+                <i id="verifiedIcon"
+                class="fa-solid fa-circle-check verified-badge"></i>
+            </h2>
+        </div>
+        <p class="profile-specialty">Eletricista Certificado</p>
+
+        <!-- Estrelas -->
+       <div class="profile-rating-badge">
+            <i class="fa-solid fa-star"></i>
+            <span>4.8</span>
+            <span class="review-count">(34 avaliações)</span>
+
+            <p id="accountStatus">Conta verificada!</p>
+        </div>
+
+        <!-- Lista de Metadados (Localização, Telefone, WhatsApp) -->
+        <div class="info-meta-list">
+            <!-- Localização -->
+            <div class="meta-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <div class="meta-data-box">
+                    <span class="label">Localização</span>
+                    <p class="meta-data-text">Luanda, Talatona</p>
+                </div>
+            </div>
+
+            <!-- Telefone -->
+            <div class="meta-item">
+                <i class="fa-solid fa-phone"></i>
+                <div class="meta-data-box">
+                    <span class="label">Telefone Directo</span>
+                    <p class="meta-data-text">+244 923 884 122</p>
+                </div>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="meta-item">
+                <i class="fa-brands fa-whatsapp">
+                </i>
+                <div class="meta-data-box">
+                    <span class="label">WhatsApp</span>
+                    <p class="meta-data-text">+244 923 884 122</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Botões de Ação Dinâmicos -->
+    <div class="actions-grid-container">
+
+        <!-- Botão Ver Portfólio -->
+        <button class="btn-action-primary btn-message" onclick="window.location.href='portifolio.html'">
+            <i class="fa-solid fa-images"></i>
+            Ver Portfólio
+        </button>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- MODAL QR -->
+    <div class="share-modal-backdrop" id="shareModal">
+    <div class="share-modal-card">
+        <div class="share-modal-header">
+            <h4>Partilhar Perfil</h4>
+            <button class="close-modal-btn" onclick="closeShareModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <div class="qr-code-box">
+            <img id="qrCodeImg" src="" alt="Código QR do Perfil">
+            <p>Digitaliza para abrir o meu perfil profissional</p>
+        </div>
+
+        <div class="share-actions-grid">
+            <button class="share-action-item" onclick="copyProfileLink()">
+                <div class="action-icon-circle"><i class="fa-solid fa-link"></i></div>
+                <span>Copiar Link</span>
+            </button>
+
+            <button class="share-action-item" onclick="copyQRImage()">
+                <div class="action-icon-circle"><i class="fa-solid fa-image"></i></div>
+                <span>Copiar QR</span>
+            </button>
+
+            <button class="share-action-item" onclick="triggerNativeShare()">
+                <div class="action-icon-circle-orange"><i class="fa-solid fa-share-nodes"></i></div>
+                <span>Partilhar</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pedidos-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Pedidos</span>
+        </a>
+        <a href="agenda.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-profissional.html" class="nav-item-tab active">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Ação para Ligar Nativa
+        function makePhoneCall(phoneNumber) {
+            window.location.href = 'tel:' + phoneNumber;
+        }
+
+        // Ação para Abrir Conversa no WhatsApp com Mensagem Padrão
+        function openWhatsApp(phoneNumber) {
+            const texto = encodeURIComponent("Olá António, vi o teu perfil no ChamaJá e gostaria de solicitar um orçamento.");
+            window.open('https://wa.me/' + phoneNumber.replace('+', '') + '?text=' + texto, '_blank');
+        }
+
+        // Alternar Estado do Botão Favoritar (Com Animação)
+        function toggleFavorite() {
+            const btn = document.getElementById('btnFav');
+            const txt = document.getElementById('favText');
+            const icon = btn.querySelector('i');
+
+            btn.classList.toggle('active');
+
+            if (btn.classList.contains('active')) {
+                icon.className = 'fa-solid fa-heart';
+                txt.textContent = 'Favoritado';
+            } else {
+                icon.className = 'fa-regular fa-heart';
+                txt.textContent = 'Adicionar aos Favoritos';
+            }
+        }
+
+        // Função extra estética para partilha
+        function shareProfile() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Perfil de António Nzage - ChamaJá',
+                    text: 'Confira o perfil deste excelente Eletricista no ChamaJá!',
+                    url: window.location.href
+                });
+            } else {
+                alert('Link do perfil copiado para a área de transferência!');
+            }
+        }
+    </script>
+
+
+
+
+
+
+
+<script>
+
+    // Abrir o Modal e gerar o QR Code correspondente ao link atual
+// Abrir o Modal e gerar o QR Code usando um provedor super estável
+function shareProfile() {
+    // Pegamos o link atual da barra do navegador (ou podes fixar o teu link se preferires)
+    const currentUrl = window.location.href;
+    
+    // Usando a API estável do qrserver.com (Tamanho 200x200)
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
+    
+    // Atribui a nova imagem ao elemento do modal
+    document.getElementById('qrCodeImg').src = qrImageUrl;
+    
+    // Mostra o Modal no ecrã
+    document.getElementById('shareModal').style.display = 'flex';
+}
+
+// Fechar o Modal
+function closeShareModal() {
+    document.getElementById('shareModal').style.display = 'none';
+}
+
+// AÇÃO 1: Copiar o Link da Página para a área de transferência
+function copyProfileLink() {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+        alert("Link do perfil copiado com sucesso!");
+    }).catch(err => {
+        alert("Erro ao copiar o link.");
+    });
+}
+
+// AÇÃO 2: Copiar a imagem do QR Code para enviar direto em conversas
+async function copyQRImage() {
+    try {
+        const qrImg = document.getElementById('qrCodeImg');
+        const response = await fetch(qrImg.src);
+        const blob = await response.blob();
+        
+        await navigator.clipboard.write([
+            new ClipboardItem({ [blob.type]: blob })
+        ]);
+        alert("Imagem do QR Code copiada! Podes colá-la no WhatsApp.");
+    } catch (err) {
+        // Fallback caso o navegador bloqueie a cópia direta de blobs remotos
+        alert("Para guardar o QR Code, pressiona continuamente em cima da imagem e escolhe 'Guardar/Copiar'.");
+    }
+}
+
+// AÇÃO 3: Menu de Partilha Nativo do Telemóvel (WhatsApp, etc.)
+function triggerNativeShare() {
+    const currentUrl = window.location.href;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'ChamaJá - Perfil Profissional',
+            text: 'Dá uma vista de olhos no meu perfil profissional no ChamaJá!',
+            url: currentUrl
+        }).catch(err => console.log("Partilha cancelada"));
+    } else {
+        // Fallback caso o navegador de desktop antigo não suporte a Share API
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent('Vê o meu perfil no ChamaJá: ' + currentUrl)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+}
+
+// Fecha o modal se o utilizador clicar fora do card branco
+window.onclick = function(event) {
+    const modal = document.getElementById('shareModal');
+    if (event.target === modal) {
+        closeShareModal();
+    }
+}
+
+</script>
+
+
+
+
+<!-- FUNCIONAMENTO DO ICON DE VERIFICAÇÃO -->
+<script>
+
+const status = document.getElementById("accountStatus");
+const verifiedIcon = document.getElementById("verifiedIcon");
+
+const estado = status.textContent.trim().toLowerCase();
+
+if (estado === "conta verificada!") {
+    verifiedIcon.style.display = "inline-block";
+    status.style.display = "none";
+} else if (estado === "conta não verificada!") {
+    verifiedIcon.style.display = "none";
+    status.style.display = "inline-block";
+}
+
+</script>
+
+
+
+
+
+</body>
+</html>

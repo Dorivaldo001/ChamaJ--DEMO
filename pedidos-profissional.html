@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Pedidos Recebidos</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --danger-red: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 30px;
+        }
+
+        /* --- NAVEGAÇÃO SUPERIOR --- */
+        .top-nav-bar {
+            background-color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--text-dark);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .top-nav-bar h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* --- LISTA DE PEDIDOS --- */
+        .requests-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .request-card {
+            background-color: white;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Topo do Cartão: Cliente e Data */
+        .request-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .client-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .client-info h3 {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .client-info p {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        .request-badge-status {
+            background-color: rgba(255, 138, 0, 0.1);
+            color: var(--secondary-orange);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Corpo do Detalhe: Serviço, Data/Hora e Fotos */
+        .request-details-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            line-height: 1.4;
+        }
+
+        .detail-row i {
+            color: var(--primary-blue);
+            margin-top: 3px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .detail-row span.label {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .detail-row p.description {
+            color: var(--text-gray);
+        }
+
+        /* Galeria Anexada pelo Cliente */
+        .attached-photos-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .attached-photos-row img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        /* --- BOTÕES DE AÇÃO --- */
+        .actions-btn-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .btn-request-action {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-request-action:active {
+            opacity: 0.8;
+        }
+
+        /* Estilos individuais baseados na ação */
+        .btn-accept {
+            background-color: var(--success-green);
+            color: white;
+            grid-column: span 2; /* Ganha destaque total ocupando a linha toda */
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .btn-negotiate {
+            background-color: white;
+            color: var(--secondary-orange);
+            border: 1px solid var(--secondary-orange);
+        }
+
+        .btn-reject {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+
+
+
+
+
+
+
+
+/* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Navegação Superior -->
+    <div class="top-nav-bar">
+        <h2>Pedidos Recebidos</h2>
+    </div>
+
+    <!-- Container dos Pedidos -->
+    <div class="requests-container">
+        
+        <!-- Cartão de Pedido 1 -->
+        <div class="request-card" id="request-01">
+            <!-- Topo -->
+            <div class="request-card-header">
+                <div class="client-info">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="Sandra">
+                    <div>
+                        <h3>Sandra Silva</h3>
+                        <p>Cliente Particular</p>
+                    </div>
+                </div>
+                <span class="request-badge-status">Pendente</span>
+            </div>
+
+            <!-- Detalhes do Pedido -->
+            <div class="request-details-body">
+                <div class="detail-row">
+                    <i class="fa-solid fa-wrench"></i>
+                    <div>
+                        <span class="label">Serviço:</span>
+                        <p class="description">Curto-circuito nas tomadas da cozinha. Os disjuntores disparam sempre que ligo o frigorífico.</p>
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <span class="label">Endereço:</span>
+                        <p class="description">Luanda, Maianga, Rua Amílcar Cabral, Prédio 4B, Apto 12</p>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <div>
+                        <span class="label">Agendamento:</span>
+                        <p class="description">Hoje, às 14:30</p>
+                    </div>
+                </div>
+
+                <!-- Fotos Anexadas -->
+                <div class="attached-photos-row">
+                    <img src="https://images.unsplash.com/photo-1621905252507-b354bc25edac?w=150" alt="Foto do Quadro" onclick="alert('Expandir imagem...')">
+                    <img src="https://images.unsplash.com/photo-1558224454-9090669b2b52?w=150" alt="Foto da Tomada" onclick="alert('Expandir imagem...')">
+                </div>
+            </div>
+
+            <!-- Botões Operacionais -->
+            <div class="actions-btn-group">
+                <!-- Botão Aceitar -->
+                <button class="btn-request-action btn-accept" onclick="processAction('aceitar', 'request-01')">
+                    <i class="fa-solid fa-circle-check"></i> Aceitar Serviço
+                </button>
+                
+                <!-- Botão Negociar -->
+                <button class="btn-request-action btn-negotiate" onclick="processAction('negociar', 'request-01')">
+                    <i class="fa-solid fa-comments-dollar"></i> Negociar Preço
+                </button>
+
+                <!-- Botão Recusar -->
+                <button class="btn-request-action btn-reject" onclick="processAction('recusar', 'request-01')">
+                    <i class="fa-solid fa-circle-xmark"></i> Recusar
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pedidos-profissional.html" class="nav-item-tab active">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Pedidos</span>
+        </a>
+        <a href="agenda.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+
+
+
+    <script>
+        // Função para gerir as ações em tempo real
+        function processAction(action, requestId) {
+            const card = document.getElementById(requestId);
+
+            if (action === 'aceitar') {
+                alert('Pedido aceite com sucesso! O cliente será notificado e o serviço foi adicionado à sua agenda.');
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 300);
+            } 
+            
+            else if (action === 'recusar') {
+                const certeza = confirm('Tem a certeza que deseja recusar este pedido de serviço?');
+                if (certeza) {
+                    alert('Pedido recusado.');
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '0';
+                    setTimeout(() => card.remove(), 300);
+                }
+            } 
+            
+            else if (action === 'negociar') {
+                // Redireciona para o chat para iniciar a negociação de valores
+                alert('A abrir o chat com o cliente para negociar valores...');
+                window.location.href = 'chat.html';
+            }
+        }
+    </script>
+</body>
+</html>

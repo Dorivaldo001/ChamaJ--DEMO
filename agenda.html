@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Minha Agenda</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --danger-red: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 30px;
+        }
+
+        /* --- NAVEGAÇÃO SUPERIOR --- */
+        .top-nav-bar {
+            background-color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--text-dark);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .top-nav-bar h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* --- SECCÃO DO CALENDÁRIO MÓVEL --- */
+        .calendar-section {
+            background-color: white;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .calendar-month-year {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+
+        .day-column {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 4px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .day-column span.day-name {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .day-column span.day-number {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* Estados do dia no calendário */
+        .day-column.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        .day-column.active span.day-name { color: rgba(255,255,255,0.8); }
+
+        .day-column.has-event {
+            position: relative;
+        }
+        .day-column.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background-color: var(--secondary-orange);
+            border-radius: 50%;
+        }
+        .day-column.active.has-event::after { background-color: white; }
+
+        /* --- FILTROS DE ESTADO RAPIDOS --- */
+        .filter-tabs-wrapper {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px 8px 20px;
+            overflow-x: auto;
+        }
+
+        .filter-chip {
+            white-space: nowrap;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: white;
+            color: var(--text-gray);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            background-color: var(--text-dark);
+            color: white;
+            border-color: var(--text-dark);
+        }
+
+        /* --- LISTA DE AGENDAMENTOS --- */
+        .agenda-list-container {
+            padding: 12px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .agenda-card {
+            background-color: white;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.01);
+        }
+
+        .agenda-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Badges de Estados */
+        .status-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        .status-badge.status-marcado { background-color: rgba(10, 57, 138, 0.1); color: var(--primary-blue); }
+        .status-badge.status-concluido { background-color: rgba(16, 185, 129, 0.1); color: var(--success-green); }
+        .status-badge.status-pendente { background-color: rgba(255, 138, 0, 0.1); color: var(--secondary-orange); }
+
+        .agenda-card-body h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .agenda-card-body p.client {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-bottom: 6px;
+        }
+
+        .agenda-card-body p.location {
+            font-size: 12px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .agenda-card-body p.location i { color: var(--text-gray); }
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Navegação Superior -->
+    <div class="top-nav-bar">
+        <h2>Minha Agenda</h2>
+    </div>
+
+    <!-- Calendário Semanal Dinâmico -->
+    <div class="calendar-section">
+        <div class="calendar-month-year">
+            <span>Julho 2026</span>
+            <div style="font-size: 13px; color: var(--text-gray);">
+                <i class="fa-solid fa-chevron-left" style="margin-right: 12px; cursor: pointer;"></i>
+                <i class="fa-solid fa-chevron-right" style="cursor: pointer;"></i>
+            </div>
+        </div>
+        
+        <div class="calendar-week-grid">
+            <div class="day-column">
+                <span class="day-name">Seg</span>
+                <span class="day-number">06</span>
+            </div>
+            <div class="day-column active has-event">
+                <span class="day-name">Ter</span>
+                <span class="day-number">07</span>
+            </div>
+            <div class="day-column has-event">
+                <span class="day-name">Qua</span>
+                <span class="day-number">08</span>
+            </div>
+            <div class="day-column">
+                <span class="day-name">Qui</span>
+                <span class="day-number">09</span>
+            </div>
+            <div class="day-column has-event">
+                <span class="day-name">Sex</span>
+                <span class="day-number">10</span>
+            </div>
+            <div class="day-column">
+                <span class="day-name">Sáb</span>
+                <span class="day-number">11</span>
+            </div>
+            <div class="day-column">
+                <span class="day-name">Dom</span>
+                <span class="day-number">12</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros Rápidos (Chips) -->
+    <div class="filter-tabs-wrapper">
+        <button class="filter-chip active" onclick="filterAgenda('todos', this)">Todos</button>
+        <button class="filter-chip" onclick="filterAgenda('pendente', this)">Serviços Pendentes</button>
+        <button class="filter-chip" onclick="filterAgenda('marcado', this)">Serviços Marcados</button>
+        <button class="filter-chip" onclick="filterAgenda('concluido', this)">Serviços Concluídos</button>
+    </div>
+
+    <!-- Lista de Agendamentos -->
+    <div class="agenda-list-container" id="agendaItemsBox">
+        
+        <!-- Cartão: Serviço Marcado -->
+        <div class="agenda-card" data-status="marcado">
+            <div class="agenda-card-top">
+                <div class="time-box">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>14:30</span>
+                </div>
+                <span class="status-badge status-marcado">Marcado</span>
+            </div>
+            <div class="agenda-card-body">
+                <h3>Reparação de Curto-Circuito</h3>
+                <p class="client">Cliente: Sandra Silva</p>
+                <p class="location"><i class="fa-solid fa-location-dot"></i> Maianga, Luanda</p>
+            </div>
+        </div>
+
+        <!-- Cartão: Serviço Pendente -->
+        <div class="agenda-card" data-status="pendente">
+            <div class="agenda-card-top">
+                <div class="time-box">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>16:00</span>
+                </div>
+                <span class="status-badge status-pendente">Pendente</span>
+            </div>
+            <div class="agenda-card-body">
+                <h3>Instalação de Focos LED</h3>
+                <p class="client">Cliente: Marcos Paulo</p>
+                <p class="location"><i class="fa-solid fa-location-dot"></i> Talatona, Luanda</p>
+            </div>
+        </div>
+
+        <!-- Cartão: Serviço Concluído -->
+        <div class="agenda-card" data-status="concluido">
+            <div class="agenda-card-top">
+                <div class="time-box">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Ontem</span>
+                </div>
+                <span class="status-badge status-concluido">Concluído</span>
+            </div>
+            <div class="agenda-card-body">
+                <h3>Manutenção de Quadro Geral</h3>
+                <p class="client">Cliente: Isabel dos Santos</p>
+                <p class="location"><i class="fa-solid fa-location-dot"></i> Alvalade, Luanda</p>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pedidos-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Pedidos</span>
+        </a>
+        <a href="agenda.html" class="nav-item-tab active">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Sistema de filtro dinâmico por estados
+        function filterAgenda(status, element) {
+            // Atualiza classe ativa nos botões/chips
+            const chips = document.querySelectorAll('.filter-chip');
+            chips.forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+
+            // Filtra os cartões
+            const cards = document.querySelectorAll('.agenda-card');
+            cards.forEach(card => {
+                if (status === 'todos' || card.getAttribute('data-status') === status) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Lógica visual para clique nos dias do calendário
+        const days = document.querySelectorAll('.day-column');
+        days.forEach(day => {
+            day.addEventListener('click', () => {
+                days.forEach(d => d.classList.remove('active'));
+                day.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

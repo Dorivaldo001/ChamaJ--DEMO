@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Recuperar Senha Profissional</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--primary-blue);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Topo Azul com Boas-vindas */
+        .top-hero-section {
+            padding: 50px 24px 30px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .welcome-text h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+        }
+
+        .mini-logo-box {
+            width: 75px;
+            height: 75px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            flex-shrink: 0;
+            border: 3px solid var(--primary-blue); /* Ajustado para azul no perfil do profissional */
+        }
+
+        .mini-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Corpo Branco */
+        .content-body {
+            background-color: var(--bg-light);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            flex-grow: 1;
+            width: 100%;
+            padding: 0 20px 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Card Principal */
+        .recovery-card {
+            background-color: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 410px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            margin-top: -20px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .instruction-text {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        /* Estilo do Input de Telefone com Select Embutido */
+        .phone-container-block {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: #FAFAFA;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .phone-container-block:focus-within {
+            border-color: var(--primary-blue);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(10, 57, 138, 0.1);
+        }
+
+        .country-select-inline {
+            display: flex;
+            align-items: center;
+            padding: 0 12px 0 16px;
+            height: 52px;
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .country-select-inline select {
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            outline: none;
+            padding-right: 14px;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .select-chevron {
+            font-size: 10px;
+            color: #94A3B8;
+            position: absolute;
+            right: 6px;
+            pointer-events: none;
+        }
+
+        .input-phone-wrapper {
+            flex-grow: 1;
+        }
+
+        .input-phone-wrapper input {
+            width: 100%;
+            height: 52px;
+            border: none;
+            background: transparent;
+            padding: 0 16px;
+            font-size: 15px;
+            outline: none;
+            color: var(--text-dark);
+        }
+
+        /* Botões Principais em Azul para o Profissional */
+        .btn-blue-submit {
+            width: 100%;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(10, 57, 138, 0.2);
+            transition: background-color 0.2s;
+        }
+
+        .btn-blue-submit:active {
+            background-color: var(--primary-dark);
+        }
+
+        .back-to-login {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-to-login span {
+            color: var(--primary-blue);
+        }
+
+        /* Estrutura dos Modais */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 380px;
+            padding: 30px 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            font-size: 20px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        /* Inputs do código de 6 dígitos */
+        .code-inputs-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 25px 0;
+        }
+
+        .code-field {
+            width: 45px;
+            height: 52px;
+            border: 1px solid var(--border-color);
+            background-color: #F8FAFC;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .code-field:focus {
+            border-color: var(--primary-blue);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(10, 57, 138, 0.1);
+        }
+
+        /* Feedback de Sucesso (Ícone de Bom) */
+        .success-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-icon-circle {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        /* Inputs de nova senha adicionais */
+        .standard-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .standard-input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: #A0AEC0;
+        }
+
+        .standard-input-wrapper input {
+            width: 100%;
+            padding: 15px 16px 15px 46px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background-color: #F8FAFC;
+        }
+
+        .standard-input-wrapper input:focus {
+            border-color: var(--primary-blue);
+            background-color: white;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .legal-footer {
+            max-width: 320px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Topo -->
+    <div class="top-hero-section">
+        <div class="welcome-text">
+            <h2>Recuperar Senha</h2>
+            <p>Encontre a sua conta de<br><span>Profissional ChamaJá</span></p>
+        </div>
+        <div class="mini-logo-box">
+            <img src="img/LOGO1.png" alt="Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'%230A398A\'/><text x=\'50%\' y=\'55%\' fill=\'white\' font-weight=\'bold\' font-size=\'14\' text-anchor=\'middle\'>ChamaJá</text></svg>'">
+        </div>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="content-body">
+        <div class="recovery-card">
+            <p class="instruction-text">Insira o número de telefone associado ao seu perfil profissional. Enviaremos um código SMS de 6 dígitos para validar a sua identidade corporativa.</p>
+            
+            <form onsubmit="handleSendCode(event)">
+                <div class="form-group">
+                    <label>Número de Telefone</label>
+                    <div class="phone-container-block">
+                        <div class="country-select-inline">
+                            <select id="country-code">
+                                <option value="244" selected>🇦🇴 +244</option>
+                                <option value="258">🇲🇿 +258</option>
+                                <option value="264">🇳🇦 +264</option>
+                                <option value="27">🇿🇦 +27</option>
+                                <option value="351">🇵🇹 +351</option>
+                                <option value="55">🇧🇷 +55</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-chevron"></i>
+                        </div>
+                        <div class="input-phone-wrapper">
+                            <input type="tel" placeholder="923 000 000" inputmode="tel" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-blue-submit">Enviar código</button>
+            </form>
+
+            <a href="login.html" class="back-to-login">Voltar ao <span>Login</span></a>
+        </div>
+
+    </div>
+
+    <!-- MODAL 1: Inserção do Código de 6 Dígitos -->
+    <div class="modal-overlay" id="modalCodigo">
+        <div class="modal-content" id="boxCodigoCorpo">
+            <h3>Confirmar Código</h3>
+            <p class="instruction-text" style="font-size: 13px;">Introduza o código de verificação enviado para o seu telemóvel.</p>
+            
+            <div class="code-inputs-wrapper">
+                <input type="text" maxlength="1" class="code-field" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="code-field" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="code-field" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="code-field" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="code-field" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" maxlength="1" class="code-field" inputmode="numeric" pattern="[0-9]*">
+            </div>
+
+            <button type="button" class="btn-blue-submit" onclick="verifyCode()">Verificar Código</button>
+        </div>
+
+        <!-- Estado de Sucesso -->
+        <div class="modal-content success-state" id="boxSucessoCorpo">
+            <div class="success-icon-circle">
+                <i class="fa-solid fa-thumbs-up"></i>
+            </div>
+            <h3>Código Correto!</h3>
+            <p class="instruction-text">A sua identidade profissional foi validada.</p>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Atualização da Senha -->
+    <div class="modal-overlay" id="modalNovaSenha">
+        <div class="modal-content">
+            <h3>Nova Senha Profissional</h3>
+            <p class="instruction-text" style="font-size: 13px; margin-bottom: 15px;">Defina a sua nova palavra-passe de acesso à plataforma.</p>
+            
+            <form onsubmit="handleUpdatePassword(event)">
+                <div class="standard-input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="novaSenha" placeholder="Nova Senha" required>
+                </div>
+                <div class="standard-input-wrapper">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <input type="password" id="confirmarSenha" placeholder="Verificar Senha" required>
+                </div>
+
+                <button type="submit" class="btn-blue-submit">Atualizar Senha</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function handleSendCode(event) {
+            event.preventDefault();
+            document.getElementById('modalCodigo').classList.add('active');
+            setupCodeInputsInputs();
+        }
+
+        function setupCodeInputsInputs() {
+            const inputs = document.querySelectorAll('.code-field');
+            inputs.forEach((input, index) => {
+                input.addEventListener('keyup', (e) => {
+                    if (e.target.value.length === 1 && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                    if (e.key === "Backspace" && index > 0 && e.target.value.length === 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
+        }
+
+        function verifyCode() {
+            document.getElementById('boxCodigoCorpo').style.display = 'none';
+            document.getElementById('boxSucessoCorpo').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('modalCodigo').classList.remove('active');
+                
+                setTimeout(() => {
+                    document.getElementById('modalNovaSenha').classList.add('active');
+                }, 300);
+
+            }, 2000);
+        }
+
+        function handleUpdatePassword(event) {
+            event.preventDefault();
+            
+            const nova = document.getElementById('novaSenha').value;
+            const confirmacao = document.getElementById('confirmarSenha').value;
+
+            if (nova !== confirmacao) {
+                alert('As palavras-passe não coincidem. Tente novamente.');
+                return;
+            }
+
+            alert('Senha profissional atualizada com sucesso!');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

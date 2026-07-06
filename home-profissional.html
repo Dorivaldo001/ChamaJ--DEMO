@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Painel do Profissional</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --star-gold: #FFB800;
+            --success-green: #10B981;
+            --danger-red: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 90px; /* Espaço para o menu inferior */
+        }
+
+        /* --- TOPO --- */
+        .header-container {
+            background-color: white;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pro-profile-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pro-avatar-wrapper {
+            position: relative;
+            width: 52px;
+            height: 52px;
+        }
+
+        .pro-avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-blue);
+        }
+
+        /* Seletor de Estado (Online/Ocupado) acoplado à foto */
+        .status-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background-color: var(--success-green);
+        }
+        .status-indicator.busy { background-color: var(--danger-red); }
+
+        .pro-welcome h3 { font-size: 16px; font-weight: 800; }
+        
+        .status-select-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .status-select-wrapper select {
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-gray);
+            outline: none;
+            cursor: pointer;
+            padding-right: 4px;
+        }
+
+        .noti-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .noti-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--secondary-orange);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* --- PAINEL DE RESUMO (DASHBOARD) --- */
+        .summary-dashboard {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .summary-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .summary-card.full-width {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .summary-card .card-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .summary-card.full-width .card-label { color: rgba(255,255,255,0.7); }
+
+        .summary-card .card-value { font-size: 20px; font-weight: 800; }
+        .summary-card.full-width .card-value { font-size: 24px; color: white; }
+
+        .summary-card i { font-size: 16px; margin-bottom: 2px; }
+        .color-pending { color: var(--secondary-orange); }
+        .color-today { color: var(--primary-blue); }
+        .color-done { color: var(--success-green); }
+        .color-star { color: var(--star-gold); }
+
+        /* --- AÇÕES RÁPIDAS --- */
+        .section-title {
+            padding: 12px 20px 8px 20px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .quick-actions-row {
+            display: flex;
+            gap: 10px;
+            padding: 4px 20px 16px 20px;
+            overflow-x: auto;
+        }
+        .quick-actions-row::-webkit-scrollbar { display: none; }
+
+        .action-chip {
+            white-space: nowrap;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+        .action-chip i { color: var(--primary-blue); }
+
+        /* --- PRÓXIMOS SERVIÇOS --- */
+        .jobs-container {
+            padding: 0 20px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .job-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .job-client-info { display: flex; align-items: center; gap: 10px; }
+        .job-client-info img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .job-client-info h4 { font-size: 14px; font-weight: 700; }
+
+        .job-time-badge {
+            background-color: rgba(10, 57, 138, 0.08);
+            color: var(--primary-blue);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .job-details-row {
+            font-size: 12px;
+            color: var(--text-gray);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .job-view-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* --- ÚLTIMAS AVALIAÇÕES --- */
+        .reviews-container {
+            padding: 0 20px 16px 20px;
+        }
+
+        .review-mini-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .review-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .review-user { font-size: 13px; font-weight: 700; }
+        .review-stars { color: var(--star-gold); font-size: 11px; }
+
+        .review-comment {
+            font-size: 12px;
+            color: var(--text-gray);
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        /* --- ESTATÍSTICA --- */
+        .stats-grid {
+            padding: 0 20px 16px 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-box {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-box .stat-num { font-size: 18px; font-weight: 800; color: var(--primary-blue); }
+        .stat-box .stat-lbl { font-size: 11px; color: var(--text-gray); font-weight: 600; margin-top: 2px; }
+
+
+
+
+
+
+
+
+/* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Topo / Cabeçalho -->
+<div class="header-container">
+    <div class="pro-profile-info">
+        <div class="pro-avatar-wrapper">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="António">
+            <div class="status-indicator" id="avatarStatusDot"></div>
+        </div>
+        <div class="pro-welcome">
+            <h3>Olá, António!</h3>
+            <div class="status-select-wrapper">
+                <select id="proStatusSelect" onchange="updateProStatus()">
+                    <option value="available">🟢 Disponível</option>
+                    <option value="busy">🔴 Ocupado</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grupo de Botões de Ação (Notificações, Configurações e Sair) -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <!-- Botão Notificações -->
+        <a href="notificacoes.html" class="noti-btn">
+            <i class="fa-regular fa-bell"></i>
+            <div class="noti-badge"></div>
+        </a>
+
+        <!-- Botão Configurações -->
+        <a href="configuracoes.html" class="noti-btn" title="Configurações">
+            <i class="fa-solid fa-gear"></i>
+        </a>
+
+        <!-- Botão Sair -->
+        <button onclick="confirmLogout()" class="noti-btn" style="cursor: pointer; background: white;" title="Sair">
+            <i class="fa-solid fa-right-from-bracket" style="color: var(--danger-red, #EF4444);"></i>
+        </button>
+    </div>
+</div>
+
+    <!-- Painel de Resumo (Dashboard) -->
+    <div class="summary-dashboard">
+        <!-- Ganhos Totais -->
+        <div class="summary-card full-width">
+            <span class="card-label">Ganhos Estimados (Mês)</span>
+            <span class="card-value">145.000 Kz</span>
+        </div>
+        <!-- Pedidos Pendentes -->
+        <div class="summary-card">
+            <i class="fa-solid fa-clock-rotate-left color-pending"></i>
+            <span class="card-label">Pendentes</span>
+            <span class="card-value">3</span>
+        </div>
+        <!-- Serviços para Hoje -->
+        <div class="summary-card">
+            <i class="fa-solid fa-calendar-day color-today"></i>
+            <span class="card-label">Para Hoje</span>
+            <span class="card-value">2</span>
+        </div>
+        <!-- Serviços Concluídos -->
+        <div class="summary-card">
+            <i class="fa-solid fa-circle-check color-done"></i>
+            <span class="card-label">Concluídos</span>
+            <span class="card-value">28</span>
+        </div>
+        <!-- Avaliação Média -->
+        <div class="summary-card">
+            <i class="fa-solid fa-star color-star"></i>
+            <span class="card-label">Avaliação</span>
+            <span class="card-value">4.9</span>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="section-title">Ações Rápidas</div>
+    <div class="quick-actions-row">
+        <a href="pedidos-profissional.html" class="action-chip"><i class="fa-solid fa-list-check"></i> Ver Pedidos</a>
+        <a href="agenda.html" class="action-chip"><i class="fa-solid fa-calendar-days"></i> Abrir Agenda</a>
+        <a href="editar-perfil-pro.html" class="action-chip"><i class="fa-solid fa-user-gear"></i> Editar Perfil</a>
+        <a href="portfolio-pro.html" class="action-chip"><i class="fa-solid fa-images"></i> Atualizar Portfólio</a>
+    </div>
+
+    <!-- Próximos Serviços -->
+    <div class="section-title">Próximos Serviços</div>
+    <div class="jobs-container">
+        <div class="job-card">
+            <div class="job-header">
+                <div class="job-client-info">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Dorivaldo">
+                    <h4>Dorivaldo Silva</h4>
+                </div>
+                <div class="job-time-badge">14:30</div>
+            </div>
+            <div class="job-details-row">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Maianga, Rua Amílcar Cabral</span>
+            </div>
+            <a href="detalhes-pedido-pro.html" class="job-view-btn">Ver Detalhes</a>
+        </div>
+    </div>
+
+    <!-- Últimas Avaliações -->
+    <div class="section-title">Últimas Avaliações</div>
+    <div class="reviews-container">
+        <div class="review-mini-card">
+            <div class="review-top">
+                <span class="review-user">Dorivaldo Silva</span>
+                <div class="review-stars">
+                    <i class="fa-solid fa-star"></i> 5.0
+                </div>
+            </div>
+            <p class="review-comment">"Excelente profissional, resolveu o curto-circuito muito rápido e deixou tudo limpo."</p>
+        </div>
+    </div>
+
+    <!-- Estatísticas Gerais -->
+    <div class="section-title">Estatísticas Totais</div>
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-num">42</div>
+            <div class="stat-lbl">Total de Clientes</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">56</div>
+            <div class="stat-lbl">Trabalhos Realizados</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">18</div>
+            <div class="stat-lbl">Favoritado por</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">4.9</div>
+            <div class="stat-lbl">Nota Média Geral</div>
+        </div>
+    </div>
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home-profissional.html" class="nav-item-tab active">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pedidos-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Pedidos</span>
+        </a>
+        <a href="agenda.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Sincroniza o estado de disponibilidade visual com a escolha do Dropdown
+        function updateProStatus() {
+            const select = document.getElementById('proStatusSelect');
+            const dot = document.getElementById('avatarStatusDot');
+            
+            if (select.value === 'busy') {
+                dot.className = "status-indicator busy";
+            } else {
+                dot.className = "status-indicator";
+            }
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+<script>
+function confirmLogout() {
+    const sair = confirm("Deseja realmente sair da conta?");
+
+    if (sair) {
+        window.location.href = "login.html";
+    }
+    // se clicar em "Cancelar", nada acontece (fecha automaticamente)
+}
+</script>
+
+
+
+
+
+</body>
+</html>

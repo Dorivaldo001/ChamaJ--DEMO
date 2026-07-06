@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Avaliações do Profissional</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --star-gold: #F59E0B;
+            --success-green: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 40px;
+        }
+
+        /* --- NAVEGAÇÃO SUPERIOR --- */
+        .top-nav-bar {
+            background-color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--text-dark);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .top-nav-bar h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* --- RESUMO GERAL DAS NOTAS --- */
+        .rating-summary-card {
+            background-color: white;
+            padding: 20px;
+            margin: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .huge-rating {
+            text-align: center;
+        }
+
+        .huge-rating h3 {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .huge-rating .stars {
+            color: var(--star-gold);
+            font-size: 12px;
+            margin: 4px 0;
+        }
+
+        .huge-rating p {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        .rating-bars-wrapper {
+            flex-grow: 1;
+            margin-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .bar-bg {
+            flex-grow: 1;
+            height: 6px;
+            background-color: #E2E8F0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background-color: var(--star-gold);
+            border-radius: 10px;
+        }
+
+        /* --- SECÇÃO DE COMENTÁRIOS EXISTENTES --- */
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            padding: 0 20px 10px 20px;
+            color: var(--text-dark);
+        }
+
+        .comments-list {
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .comment-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .comment-user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .user-meta-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-meta-info img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-meta-info h4 {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user-meta-info span {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        .comment-stars {
+            color: var(--star-gold);
+            font-size: 11px;
+        }
+
+        .comment-text {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        /* Foto do Serviço Realizado */
+        .service-done-photo {
+            width: 100%;
+            max-height: 150px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- FORMULÁRIO PARA DEIXAR NOVA AVALIAÇÃO --- */
+        .new-review-box {
+            background-color: white;
+            margin: 0 20px;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .new-review-box h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        /* Estrelas Interativas */
+        .interactive-stars-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            font-size: 26px;
+            color: #CBD5E1;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .interactive-stars-row i.selected {
+            color: var(--star-gold);
+        }
+
+        .textarea-comment {
+            width: 100%;
+            height: 80px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 13px;
+            outline: none;
+            resize: none;
+            background-color: #F8FAFC;
+            margin-bottom: 14px;
+        }
+
+        .textarea-comment:focus {
+            border-color: var(--primary-blue);
+            background-color: white;
+        }
+
+        /* Upload de Imagem */
+        .image-upload-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .image-upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            border: 1px dashed var(--primary-blue);
+            background-color: rgba(10, 57, 138, 0.04);
+            border-radius: 10px;
+            color: var(--primary-blue);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .image-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn-submit-review {
+            width: 100%;
+            background-color: var(--secondary-orange);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 138, 0, 0.2);
+        }
+
+        .btn-submit-review:active {
+            background-color: #E27B00;
+        }
+
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Navegação Superior -->
+    <div class="top-nav-bar">
+        <a href="historico.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h2>Avaliações</h2>
+    </div>
+
+
+    <!-- FORMULÁRIO: Deixar Nova Avaliação -->
+    <div class="new-review-box">
+        <h4>Avaliar Serviço</h4>
+        
+        <!-- Seleção de Nota (1 a 5 estrelas) -->
+        <div class="interactive-stars-row" id="starRatingContainer">
+            <i class="fa-solid fa-star" data-value="1"></i>
+            <i class="fa-solid fa-star" data-value="2"></i>
+            <i class="fa-solid fa-star" data-value="3"></i>
+            <i class="fa-solid fa-star" data-value="4"></i>
+            <i class="fa-solid fa-star" data-value="5"></i>
+        </div>
+
+        <form onsubmit="submitReview(event)">
+            <!-- Comentário -->
+            <textarea class="textarea-comment" placeholder="Escreva aqui o seu comentário sobre o serviço prestado..." required></textarea>
+
+            <!-- Upload da Foto do Serviço -->
+            <div class="image-upload-wrapper">
+                <div class="image-upload-btn">
+                    <i class="fa-solid fa-camera"></i>
+                    Foto do Serviço Realizado
+                </div>
+                <input type="file" accept="image/*" id="inputPhoto">
+            </div>
+
+            <button type="submit" class="btn-submit-review">Enviar Avaliação</button>
+        </form>
+    </div>
+
+
+
+
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home.html" class="nav-item-tab active">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pesquisa.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Lista</span>
+        </a>
+        <a href="historico.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Histórico</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-cliente.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        let selectedScore = 0;
+
+        // Lógica Interativa para Escolha das Estrelas (1 a 5)
+        const stars = document.querySelectorAll('#starRatingContainer i');
+        stars.forEach(star => {
+            star.addEventListener('click', (e) => {
+                selectedScore = parseInt(e.target.getAttribute('data-value'));
+                
+                // Atualiza o aspeto visual das estrelas selecionadas
+                stars.forEach((s, idx) => {
+                    if (idx < selectedScore) {
+                        s.classList.add('selected');
+                    } else {
+                        s.classList.remove('selected');
+                    }
+                });
+            });
+        });
+
+        // Submissão do Comentário
+        function submitReview(event) {
+            event.preventDefault();
+
+            if (selectedScore === 0) {
+                alert('Por favor, atribua uma nota de 1 a 5 estrelas antes de submeter.');
+                return;
+            }
+
+            alert('Muito obrigado! A sua avaliação foi submetida com sucesso.');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

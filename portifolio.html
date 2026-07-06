@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Portfólio do Profissional</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 30px;
+        }
+
+        /* --- NAVEGAÇÃO SUPERIOR --- */
+        .top-nav-bar {
+            background-color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--text-dark);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .top-nav-bar h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* --- RESUMO DO PROFISSIONAL & DESCRIÇÃO --- */
+        .portfolio-intro {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pro-mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .pro-mini-profile img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .pro-mini-info h3 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .pro-mini-info p {
+            font-size: 12px;
+            color: var(--secondary-orange);
+            font-weight: 600;
+        }
+
+        .services-description h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--primary-blue);
+        }
+
+        .services-description p {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        /* --- ABAS DE NAVEGAÇÃO DO PORTFÓLIO --- */
+        .tabs-container {
+            display: flex;
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 57px;
+            z-index: 99;
+        }
+
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-gray);
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        /* --- CONTEÚDO DAS ABAS --- */
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 1. Galeria & Vídeos */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .media-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            position: relative;
+            aspect-ratio: 1 / 1;
+        }
+
+        .media-card img, .media-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(10, 57, 138, 0.85);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        /* 2. Antes e Depois */
+        .before-after-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .split-card-container {
+            background-color: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .split-images {
+            display: flex;
+            height: 160px;
+        }
+
+        .split-half {
+            flex: 1;
+            position: relative;
+        }
+
+        .split-half img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .split-label {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background-color: rgba(0, 0, 0, 0.65);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .split-label.after-color {
+            background-color: var(--success-green);
+        }
+
+        .split-info-bar {
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 3. Projectos Realizados */
+        .projects-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .project-card {
+            background-color: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .project-details {
+            padding: 16px;
+        }
+
+        .project-details h5 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .project-details p {
+            font-size: 12px;
+            color: var(--text-gray);
+            line-height: 1.4;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <div class="top-nav-bar">
+        <a href="perfil-profissional.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h2>Portfólio</h2>
+    </div>
+
+    <!-- Descrição dos Serviços & Mini Perfil -->
+    <div class="portfolio-intro">
+        <div class="pro-mini-profile">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="António">
+            <div class="pro-mini-info">
+                <h3>António Nzage</h3>
+                <p>Eletricista Certificado</p>
+            </div>
+        </div>
+        <div class="services-description">
+            <h4>Descrição dos Serviços</h4>
+            <p>Especialista em montagens elétricas residenciais e industriais, manutenção preventiva de quadros elétricos, instalação de sistemas de iluminação LED inteligente e resolução rápida de curto-circuitos com total segurança e garantia certificada.</p>
+        </div>
+    </div>
+
+    <!-- Abas Alternáveis -->
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab(event, 'tab-media')">Galeria & Vídeos</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-compare')">Antes e Depois</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-projects')">Projetos</button>
+    </div>
+
+    <!-- ABA 1: GALERIA DE IMAGENS & VÍDEOS -->
+    <div id="tab-media" class="tab-content active">
+        <div class="media-grid">
+            <!-- Imagem 1 -->
+            <div class="media-card">
+                <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=300" alt="Trabalho">
+            </div>
+            <!-- Imagem 2 -->
+            <div class="media-card">
+                <img src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=300" alt="Trabalho">
+            </div>
+            <!-- Cartão de Vídeo -->
+            <div class="media-card" onclick="playVideoPlaceholder()">
+                <div class="video-badge"><i class="fa-solid fa-play"></i></div>
+                <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=300" alt="Thumbnail Vídeo">
+            </div>
+            <!-- Imagem 3 -->
+            <div class="media-card">
+                <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=300" alt="Trabalho">
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 2: ANTES E DEPOIS -->
+    <div id="tab-compare" class="tab-content">
+        <div class="before-after-list">
+            <!-- Item 1 -->
+            <div class="split-card-container">
+                <div class="split-images">
+                    <div class="split-half">
+                        <img src="https://images.unsplash.com/photo-1558224454-9090669b2b52?w=300" alt="Antes">
+                        <span class="split-label">Antes</span>
+                    </div>
+                    <div class="split-half">
+                        <img src="https://images.unsplash.com/photo-1621905252507-b354bc25edac?w=300" alt="Depois">
+                        <span class="split-label after-color">Depois</span>
+                    </div>
+                </div>
+                <div class="split-info-bar">
+                    Reestruturação Completa do Quadro Elétrico Geral
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 3: PROJECTOS REALIZADOS -->
+    <div id="tab-projects" class="tab-content">
+        <div class="projects-column">
+            <!-- Projeto 1 -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1565538810844-1e119fa1802e?w=500" alt="Projeto">
+                <div class="project-details">
+                    <h5>Iluminação Embutida - Condomínio Talatona</h5>
+                    <p>Instalação integral de focos LED automatizados e painéis embutidos numa sala de estar moderna com controlo via smartphone.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pedidos-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Pedidos</span>
+        </a>
+        <a href="agenda.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-profissional.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Lógica de alternância de abas dinâmicas
+        function switchTab(event, tabId) {
+            // Remove classe ativa de todos os botões das abas
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Remove classe ativa de todos os blocos de conteúdo
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Adiciona classe ativa no botão clicado e no respetivo conteúdo
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Simulação estética ao clicar num vídeo
+        function playVideoPlaceholder() {
+            alert('A reproduzir o vídeo de demonstração do serviço...');
+        }
+    </script>
+</body>
+</html>

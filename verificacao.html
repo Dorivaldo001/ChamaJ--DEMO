@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Verificação Real de Conta</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); padding: 20px 20px 40px 20px; }
+
+        .header-section { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .back-btn { background: white; border: 1px solid var(--border-color); width: 40px; height: 40px; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: var(--text-dark); text-decoration: none; }
+        .header-section h2 { font-size: 18px; font-weight: 800; }
+
+        .info-alert { background-color: rgba(10, 57, 138, 0.05); border: 1px solid rgba(10, 57, 138, 0.1); padding: 14px; border-radius: 12px; font-size: 13px; color: var(--primary-blue); line-height: 1.4; margin-bottom: 24px; display: flex; gap: 10px; }
+        .section-subtitle { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-dark); }
+
+        .upload-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+        .upload-box { background-color: white; border: 2px dashed var(--border-color); border-radius: 16px; padding: 20px 12px; text-align: center; cursor: pointer; position: relative; }
+        .upload-box.loading { border-color: var(--secondary-orange); background-color: rgba(255, 138, 0, 0.02); }
+        .upload-box.success { border-color: var(--success-green); background-color: rgba(16, 185, 129, 0.02); }
+        
+        /* Input escondido que ativa a câmara nativa */
+        .upload-box input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .upload-box i { font-size: 24px; color: var(--text-gray); margin-bottom: 8px; }
+        .upload-box.success i { color: var(--success-green); }
+        .upload-box.loading i { color: var(--secondary-orange); }
+        .upload-box p { font-size: 12px; font-weight: 600; color: var(--text-dark); }
+        .upload-box span { font-size: 10px; color: var(--text-gray); display: block; margin-top: 2px; }
+
+        .form-container { background-color: white; border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 14px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 11px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; }
+        .input-group input { width: 100%; height: 48px; background-color: var(--bg-light); border: 1px solid var(--border-color); border-radius: 12px; padding: 0 14px; font-size: 13px; font-weight: 500; outline: none; }
+        
+        .input-group input.filled-by-ai { border-color: var(--success-green); background-color: rgba(16, 185, 129, 0.03); transition: all 0.5s ease; }
+
+        .btn-orange-submit { width: 100%; height: 52px; background-color: var(--secondary-orange); color: white; border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+
+        /* Modal */
+        .modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 999; display: none; justify-content: center; align-items: center; padding: 24px; }
+        .modal-card { background-color: white; border-radius: 24px; padding: 30px 24px; text-align: center; width: 100%; max-width: 340px; }
+        .modal-icon-circle { width: 64px; height: 64px; border-radius: 50%; background-color: rgba(16, 185, 129, 0.1); color: var(--success-green); display: flex; justify-content: center; align-items: center; font-size: 28px; margin: 0 auto 20px auto; }
+        .modal-card h4 { font-size: 18px; font-weight: 800; margin-bottom: 10px; }
+        .modal-card p { font-size: 13px; color: var(--text-gray); line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <a href="perfil-pro.html" class="back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+        <h2>Verificação de Conta</h2>
+    </div>
+
+    <div class="info-alert">
+        <i class="fa-solid fa-circle-info"></i>
+        <p>Tira uma foto nítida da Frente e do Verso do teu BI. Os teus dados reais serão extraídos instantaneamente via IA.</p>
+    </div>
+
+    <div class="section-subtitle">Bilhete de Identidade (Nacional)</div>
+    <div class="upload-grid">
+        <!-- Frente com acesso direto à câmara -->
+        <div class="upload-box" id="boxFrente">
+            <input type="file" accept="image/*" capture="environment" id="fileFrente" onchange="handleFileSelect('frente')">
+            <i class="fa-solid fa-camera"></i>
+            <p>Fotografar Frente</p>
+            <span id="txtFrente">Tirar foto na hora</span>
+        </div>
+
+        <!-- Verso com acesso direto à câmara -->
+        <div class="upload-box" id="boxVerso">
+            <input type="file" accept="image/*" capture="environment" id="fileVerso" onchange="handleFileSelect('verso')">
+            <i class="fa-solid fa-camera"></i>
+            <p>Fotografar Verso</p>
+            <span id="txtVerso">Tirar foto na hora</span>
+        </div>
+    </div>
+
+    <div class="section-subtitle">Dados Extraídos do Documento</div>
+    <div class="form-container">
+        <div class="input-group"><label>Nome Completo</label><input type="text" id="inpNome" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>NIF / Nº do Bilhete</label><input type="text" id="inpNif" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>Residência</label><input type="text" id="inpResidencia" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>Natural de</label><input type="text" id="inpNatural" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>Província de</label><input type="text" id="inpProvincia" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>Data de Nascimento</label><input type="text" id="inpNascimento" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>Data de Emissão</label><input type="text" id="inpEmissao" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>Emitido Em</label><input type="text" id="inpEmitidoEm" placeholder="A ler do documento..."></div>
+        <div class="input-group"><label>Válido Até</label><input type="text" id="inpValidoAte" placeholder="A ler do documento..."></div>
+    </div>
+
+    <button class="btn-orange-submit" onclick="enviarVerificacao()">
+        <i class="fa-solid fa-user-check"></i> Verificar Conta
+    </button>
+
+    <div class="modal-backdrop" id="successModal">
+        <div class="modal-card">
+            <div class="modal-icon-circle"><i class="fa-solid fa-shield-halved"></i></div>
+            <h4>Verificação Enviada!</h4>
+            <p>Os teus dados foram submetidos com sucesso. A autenticidade será analisada e, num prazo máximo de 48 horas, a tua conta receberá o selo de verificação.</p>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ COLOCA A TUA GEMINI API KEY AQUI PARA FUNCIONAR EM TEMPO REAL
+        const GEMINI_API_KEY = "ALTERA_PARA_A_TUA_GEMINI_API_KEY"; 
+
+        let imagensBI = { frente: null, verso: null };
+
+        // Converte o ficheiro fotográfico para Base64
+        function fileToGenerativePart(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve({
+                    inlineData: { data: reader.result.split(',')[1], mimeType: file.type }
+                });
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleFileSelect(lado) {
+            const input = document.getElementById(lado === 'frente' ? 'fileFrente' : 'fileVerso');
+            const box = document.getElementById(lado === 'frente' ? 'boxFrente' : 'boxVerso');
+            const txt = document.getElementById(lado === 'frente' ? 'txtFrente' : 'txtVerso');
+
+            if (!input.files || input.files.length === 0) return;
+            
+            box.className = "upload-box loading";
+            txt.innerText = "A processar imagem...";
+
+            try {
+                imagensBI[lado] = await fileToGenerativePart(input.files[0]);
+                box.className = "upload-box success";
+                txt.innerText = "✓ Foto capturada";
+
+                // Se capturou ambos os lados, faz a chamada de IA real
+                if (imagensBI.frente && imagensBI.verso) {
+                    executarOCRReal();
+                }
+            } catch (error) {
+                alert("Erro ao ler o ficheiro da câmara.");
+                box.className = "upload-box";
+            }
+        }
+
+        async function executarOCRReal() {
+            document.querySelectorAll('.form-container input').forEach(i => i.placeholder = "A analisar BI com IA...");
+            
+            // Prompt rigoroso para garantir o retorno em JSON limpo e estruturado
+            const promptText = "Analisa a frente e o verso deste Bilhete de Identidade de Angola. Extrai os dados textuais reais e devolve OBRIGATORIAMENTE apenas um objeto JSON com as seguintes chaves textuais idênticas: nome, nif, residencia, natural, provincia, nascimento, emissao, emitidoEm, validoAte. Não adiciones qualquer formatação Markdown ou texto extra, apenas o JSON bruto.";
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: promptText },
+                                imagensBI.frente,
+                                imagensBI.verso
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                let textoResposta = data.candidates[0].content.parts[0].text;
+                
+                // Limpa marcações markdown se a IA ignorar a regra de saída limpa
+                textoResposta = textoResposta.replace(/```json/g, "").replace(/```/g, "").trim();
+                
+                const resultadoJson = JSON.parse(textoResposta);
+                
+                // Preenchimento dinâmico no ecrã com os dados reais
+                preencherCamposComDadosReais(resultadoJson);
+
+            } catch (error) {
+                console.error(error);
+                alert("A API falhou ou a chave não está configurada. Verifica o console do navegador.");
+                document.querySelectorAll('.form-container input').forEach(i => i.placeholder = "Falha ao ler automaticamente.");
+            }
+        }
+
+        function preencherCamposComDadosReais(dados) {
+            const mapaCampos = {
+                inpNome: dados.nome,
+                inpNif: dados.nif,
+                inpResidencia: dados.residencia,
+                inpNatural: dados.natural,
+                inpProvincia: dados.provincia,
+                inpNascimento: dados.nascimento,
+                inpEmissao: dados.emissao,
+                inpEmitidoEm: dados.emitidoEm,
+                inpValidoAte: dados.validoAte
+            };
+
+            Object.keys(mapaCampos).forEach(id => {
+                const elemento = document.getElementById(id);
+                if (elemento && mapaCampos[id]) {
+                    elemento.value = mapaCampos[id];
+                    elemento.classList.add('filled-by-ai');
+                }
+            });
+        }
+
+        function enviarVerificacao() {
+            document.getElementById('successModal').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('successModal').style.display = 'none';
+                window.location.href = 'perfil-pro.html';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

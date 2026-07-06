@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Editar Perfil Profissional</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding: 20px 20px 40px 20px;
+        }
+
+        /* --- CABEÇALHO --- */
+        .header-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .header-section h2 {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        /* --- EDITAR FOTO DE PERFIL --- */
+        .avatar-edit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+        }
+
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .camera-overlay-btn {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: 2px solid white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .camera-overlay-btn input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .avatar-edit-container span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-top: 10px;
+        }
+
+        /* --- FORMULÁRIO --- */
+        .form-container {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+
+        .input-wrapper input, .input-wrapper select {
+            width: 100%;
+            height: 48px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 14px 0 40px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none; /* Remove seta nativa do select */
+        }
+
+        .input-wrapper select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748B'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 20px;
+        }
+
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            border-color: var(--primary-blue);
+        }
+
+        /* Grelha lado a lado para localização */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        /* --- BOTÃO GUARDAR --- */
+        .btn-orange-submit {
+            width: 100%;
+            height: 52px;
+            background-color: var(--secondary-orange);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 138, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-orange-submit:active { background-color: #E07A00; }
+
+        /* --- MODAL DE SUCESSO --- */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .modal-card {
+            background-color: white;
+            border-radius: 24px;
+            padding: 30px 24px;
+            text-align: center;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-icon-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            margin: 0 auto 20px auto;
+        }
+
+        .modal-card h4 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .modal-card p {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <div class="header-section">
+        <a href="configuracoes.html" class="back-btn">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <h2>Editar Perfil</h2>
+    </div>
+
+    <!-- Zona de Edição de Foto de Perfil -->
+    <div class="avatar-edit-container">
+        <div class="avatar-wrapper">
+            <!-- Imagem Padrão Inicial -->
+            <img id="profileAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="Foto de Perfil">
+            <!-- Botão de Câmara para Fotografar na Hora -->
+            <div class="camera-overlay-btn">
+                <i class="fa-solid fa-camera"></i>
+                <input type="file" accept="image/*" capture="user" onchange="updateAvatarPreview(this)">
+            </div>
+        </div>
+        <span>Alterar Foto de Perfil</span>
+    </div>
+
+    <!-- Formulário de Edição de Dados -->
+    <div class="form-container">
+        <!-- Nome Completo -->
+        <div class="input-group">
+            <label>Nome Completo</label>
+            <div class="input-wrapper">
+                <i class="fa-regular fa-user"></i>
+                <input type="text" id="editName" value="António Manuel Francisco">
+            </div>
+        </div>
+
+        <!-- Número de Telemóvel -->
+        <div class="input-group">
+            <label>Número de Telemóvel</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="editPhone" value="923456789" placeholder="9XXXXXXXX">
+            </div>
+        </div>
+
+        <!-- Localização Geográfica (Grelha Dupla) -->
+        <div class="location-grid">
+            <!-- Província -->
+            <div class="input-group">
+                <label>Província</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <select id="selectProvincia" onchange="atualizarMunicipios()">
+                        <option value="luanda" selected>Luanda</option>
+                        <option value="benguela">Benguela</option>
+                        <option value="huambo">Huambo</option>
+                        <option value="cabinda">Cabinda</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Município -->
+            <div class="input-group">
+                <label>Município</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <select id="selectMunicipio">
+                        <!-- Gerado dinamicamente via JS com base na província -->
+                        <option value="maianga">Maianga</option>
+                        <option value="talatona">Talatona</option>
+                        <option value="belas">Belas</option>
+                        <option value="cazenga">Cazenga</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão de Gravação -->
+    <button class="btn-orange-submit" onclick="salvarPerfilAlterado()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Alterações
+    </button>
+
+    <!-- MODAL DE SUCESSO (FECHO AUTOMÁTICO) -->
+    <div class="modal-backdrop" id="saveSuccessModal">
+        <div class="modal-card">
+            <div class="modal-icon-circle">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+            <h4>Perfil Atualizado!</h4>
+            <p>As tuas novas informações de perfil foram guardadas e sincronizadas com sucesso na plataforma ChamaJá.</p>
+        </div>
+    </div>
+
+    <!-- INTERATIVIDADE JAVASCRIPT -->
+    <script>
+        // 1. Atualizar a pré-visualização da imagem capturada na hora pela câmara
+        function updateAvatarPreview(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileAvatar').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // 2. Mudar dinamicamente os municípios com base na província selecionada
+        function atualizarMunicipios() {
+            const provincia = document.getElementById('selectProvincia').value;
+            const municipioSelect = document.getElementById('selectMunicipio');
+            
+            // Limpa opções existentes
+            municipioSelect.innerHTML = "";
+
+            const municipiosPorProvincia = {
+                luanda: ["Maianga", "Talatona", "Belas", "Cazenga", "Viana", "Kilamba Kiaxi"],
+                benguela: ["Benguela", "Lobito", "Catumbela", "Baía Farta"],
+                huambo: ["Huambo", "Caála", "Bailundo", "Ukuma"],
+                cabinda: ["Cabinda", "Cacongo", "Buco-Zau", "Belize"]
+            };
+
+            // Adiciona as novas opções correspondentes
+            municipiosPorProvincia[provincia].forEach(mun => {
+                const opt = document.createElement('option');
+                opt.value = mun.toLowerCase().replace(/\s+/g, '-');
+                opt.textContent = mun;
+                municipioSelect.appendChild(opt);
+            });
+        }
+
+        // 3. Simulação de salvamento das alterações com fecho em 4 segundos
+        function salvarPerfilAlterado() {
+            document.getElementById('saveSuccessModal').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('saveSuccessModal').style.display = 'none';
+                window.location.href = 'home-profissional.html';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

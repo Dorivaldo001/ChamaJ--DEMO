@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Histórico de Pedidos</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            
+            /* Cores dos Estados */
+            --state-esperando: #64748B;
+            --state-negociacao: #3B82F6;
+            --state-aceite: #0EA5E9;
+            --state-realizado: #10B981;
+            --state-recusado: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding: 20px 16px 100px 16px;
+        }
+
+        /* --- CABEÇALHO --- */
+        .header-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .header-section h2 {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        /* --- FILTROS POR ABA (TABS) --- */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            scrollbar-width: none; /* Ocultar barra em Firefox */
+        }
+        .tabs-container::-webkit-scrollbar {
+            display: none; /* Ocultar barra em Chrome/Safari */
+        }
+
+        .tab-item {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-gray);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-item.active {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* --- LISTA DE CARD DE PEDIDOS --- */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Topo do Card: Profissional e Estado */
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .pro-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pro-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .pro-details h4 {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .pro-details span {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        /* Estilização dos Badges de Estado */
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .status-badge.esperando { background-color: #F1F5F9; color: var(--state-esperando); }
+        .status-badge.negociacao { background-color: #EFF6FF; color: var(--state-negociacao); }
+        .status-badge.aceite { background-color: #E0F2FE; color: var(--state-aceite); }
+        .status-badge.realizado { background-color: #ECFDF5; color: var(--state-realizado); }
+        .status-badge.recusado { background-color: #FEF2F2; color: var(--state-recusado); }
+
+        /* Corpo do Card: Detalhes do Serviço */
+        .order-body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .order-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .order-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* Rodapé do Card: Ações Contextuais */
+        .order-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .btn-action {
+            flex: 1;
+            height: 38px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        /* Variações de Botões baseados no Estado */
+        .btn-relembrar {
+            background-color: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        .btn-relembrar:active { background-color: rgba(10, 57, 138, 0.05); }
+
+        .btn-cancelar {
+            background-color: transparent;
+            border: 1px solid #FDA4AF;
+            color: var(--state-recusado);
+        }
+        .btn-cancelar:active { background-color: #FEF2F2; }
+
+        .btn-avaliar {
+            background-color: var(--secondary-orange);
+            border: none;
+            color: white;
+            box-shadow: 0 3px 8px rgba(255, 138, 0, 0.2);
+            animation: pulse-alert 2s infinite;
+        }
+        .btn-avaliar:active { background-color: #E07A00; }
+
+        @keyframes pulse-alert {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); box-shadow: 0 3px 12px rgba(255, 138, 0, 0.4); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- FOOTER MENU FIXO --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+            gap: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <div class="header-section">
+        <h2>Os Meus Pedidos</h2>
+    </div>
+
+    <!-- Barra de Abas (Filtros por Estado) -->
+    <div class="tabs-container">
+        <div class="tab-item active" onclick="filtrarPedidos('todos', this)">Todos</div>
+        <div class="tab-item" onclick="filtrarPedidos('esperando', this)">Pendentes</div>
+        <div class="tab-item" onclick="filtrarPedidos('negociacao', this)">Negociando</div>
+        <div class="tab-item" onclick="filtrarPedidos('aceite', this)">Aceites</div>
+        <div class="tab-item" onclick="filtrarPedidos('realizado', this)">Realizados</div>
+    </div>
+
+    <!-- Lista Dinâmica de Pedidos -->
+    <div class="orders-list" id="listaPedidos">
+        
+        <!-- CARD 1: ESPERANDO RESPOSTA -->
+        <div class="order-card" data-status="esperando">
+            <div class="order-header">
+                <div class="pro-info">
+                    <img src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100" alt="Profissional">
+                    <div class="pro-details">
+                        <h4>Carlos Santos</h4>
+                        <span>Eletricista</span>
+                    </div>
+                </div>
+                <span class="status-badge esperando">Esperando Resposta</span>
+            </div>
+            <div class="order-body">
+                <div class="order-title">Reparação de Curto-Circuito na Sala</div>
+                <div class="order-meta">
+                    <span>Enviado: Hoje, 14:20</span>
+                    <strong>Preço: A combinar</strong>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn-action btn-relembrar" onclick="relembrarPro('Carlos Santos')"><i class="fa-regular fa-bell"></i> Relembrar</button>
+                <button class="btn-action btn-cancelar" onclick="cancelarPedido(this)"><i class="fa-regular fa-circle-xmark"></i> Cancelar</button>
+            </div>
+        </div>
+
+        <!-- CARD 2: EM NEGOCIAÇÃO -->
+        <div class="order-card" data-status="negociacao">
+            <div class="order-header">
+                <div class="pro-info">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100" alt="Profissional">
+                    <div class="pro-details">
+                        <h4>Eng.ª Maria Júlia</h4>
+                        <span>Arquiteta / Designer</span>
+                    </div>
+                </div>
+                <span class="status-badge negociacao">Em Negociação</span>
+            </div>
+            <div class="order-body">
+                <div class="order-title">Planta Baixa e Design de Cozinha</div>
+                <div class="order-meta">
+                    <span>Enviado: Ontem</span>
+                    <strong>Orçamento Proposto: 120.000 Kz</strong>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn-action btn-relembrar" style="flex: 2; background-color: var(--primary-blue); color: white; border: none;" onclick="window.location.href='chat.html'"><i class="fa-regular fa-comments"></i> Ver Chat / Negociar</button>
+                <button class="btn-action btn-cancelar" onclick="cancelarPedido(this)"><i class="fa-regular fa-circle-xmark"></i> Cancelar</button>
+            </div>
+        </div>
+
+        <!-- CARD 3: PEDIDO ACEITE -->
+        <div class="order-card" data-status="aceite">
+            <div class="order-header">
+                <div class="pro-info">
+                    <img src="https://images.unsplash.com/photo-1621574539437-4b7cb63120b8?w=100" alt="Profissional">
+                    <div class="pro-details">
+                        <h4>Mateus Andrade</h4>
+                        <span>Canalizador</span>
+                    </div>
+                </div>
+                <span class="status-badge aceite">Pedido Aceite</span>
+            </div>
+            <div class="order-body">
+                <div class="order-title">Desentupimento de Cano Principal</div>
+                <div class="order-meta">
+                    <span>Agendado para: Amanhã, 09:00</span>
+                    <strong>Preço Fechado: 15.000 Kz</strong>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn-action btn-relembrar" onclick="window.location.href='tel:923000000'"><i class="fa-solid fa-phone"></i> Ligar</button>
+                <button class="btn-action btn-cancelar" onclick="cancelarPedido(this)"><i class="fa-regular fa-circle-xmark"></i> Cancelar</button>
+            </div>
+        </div>
+
+        <!-- CARD 4: PEDIDO REALIZADO (ALERTA DE AVALIAÇÃO) -->
+        <div class="order-card" data-status="realizado">
+            <div class="order-header">
+                <div class="pro-info">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="Profissional">
+                    <div class="pro-details">
+                        <h4>Dra. Rita Cássia</h4>
+                        <span>Explicadora de Matemática</span>
+                    </div>
+                </div>
+                <span class="status-badge realizado">Pedido Realizado</span>
+            </div>
+            <div class="order-body">
+                <div class="order-title">Explicação Intensiva Exame de Admissão</div>
+                <div class="order-meta">
+                    <span>Finalizado em: 04/07/2026</span>
+                    <strong>Total Pago: 45.000 Kz</strong>
+                </div>
+            </div>
+            <div class="order-actions">
+                <!-- Botão de alerta com animação pulsante para guiar a experiência -->
+                <button class="btn-action btn-avaliar" onclick="window.location.href='avaliar-profissional.html'">
+                    <i class="fa-solid fa-star"></i> Avaliar Profissional
+                </button>
+            </div>
+        </div>
+
+        <!-- CARD 5: RECUSADO -->
+        <div class="order-card" data-status="recusado">
+            <div class="order-header">
+                <div class="pro-info">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100" alt="Profissional">
+                    <div class="pro-details">
+                        <h4>Marcos Rocha</h4>
+                        <span>Técnico de AC</span>
+                    </div>
+                </div>
+                <span class="status-badge recusado">Pedido Recusado</span>
+            </div>
+            <div class="order-body">
+                <div class="order-title">Manutenção e Carga de Gás Split 12000BTU</div>
+                <div class="order-meta">
+                    <span>Recusado em: 02/07/2026</span>
+                    <span style="color: var(--state-recusado)">Sem agenda disponível</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home.html" class="nav-item-tab active">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pesquisa.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Lista</span>
+        </a>
+        <a href="historico.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Histórico</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-cliente.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <!-- SISTEMA DE FILTRO E LÓGICA EM JAVASCRIPT -->
+    <script>
+        // Função de Filtragem por Abas
+        function filtrarPedidos(status, element) {
+            // Atualizar classe ativa na aba clicada
+            const tabs = document.querySelectorAll('.tab-item');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            // Filtrar os cards na lista
+            const cards = document.querySelectorAll('.order-card');
+            cards.forEach(card => {
+                if (status === 'todos') {
+                    card.style.display = 'flex';
+                } else {
+                    if (card.getAttribute('data-status') === status) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Ação: Relembrar Profissional (Notificação push simulada)
+        function relembrarPro(nomePro) {
+            alert('Notificação de lembrete enviada com sucesso para ' + nomePro + '!');
+        }
+
+        // Ação: Cancelar Pedido com Confirmação e remoção visual
+        function cancelarPedido(buttonElement) {
+            if (confirm('Tens a certeza que desejas cancelar este pedido pendente?')) {
+                const card = buttonElement.closest('.order-card');
+                card.style.opacity = '0.5';
+                
+                // Simulação de alteração de estado para cancelado/recusado na hora
+                const badge = card.querySelector('.status-badge');
+                badge.className = "status-badge recusado";
+                badge.textContent = "Pedido Cancelado";
+                
+                // Remove os botões de ação após o cancelamento
+                card.querySelector('.order-actions').remove();
+            }
+        }
+
+        // Ação: Avaliação
+        function avaliarProfissional(nomePro) {
+            alert('A abrir ecrã de avaliação para: ' + nomePro + '\nObrigado por ajudar a comunidade ChamaJá!');
+            // Aqui redirecionaria para: window.location.href = 'avaliar.html?pro=' + encodeURIComponent(nomePro);
+        }
+    </script>
+</body>
+</html>

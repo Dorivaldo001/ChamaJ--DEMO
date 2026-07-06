@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Perfil do Cliente</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --star-gold: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-bottom: 40px;
+        }
+
+        /* --- HEADER DO PERFIL --- */
+        .profile-header-card {
+            background-color: white;
+            padding: 30px 20px 24px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 12px auto;
+        }
+
+        .profile-avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .profile-avatar-wrapper .edit-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: var(--primary-blue);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        .profile-header-card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-header-card p.location-subtitle {
+            font-size: 12px;
+            color: var(--text-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* --- ABAS DINÂMICAS --- */
+        .profile-tabs-nav {
+            display: flex;
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .tab-trigger {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-gray);
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-trigger.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab-content-panel {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content-panel.active {
+            display: block;
+        }
+
+        /* --- HISTÓRICO DE PEDIDOS --- */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-card {
+            background-color: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+        }
+
+        .history-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-card-top span.date {
+            font-size: 11px;
+            color: var(--text-gray);
+        }
+
+        .status-pill {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        .status-pill.done { background-color: rgba(16, 185, 129, 0.1); color: var(--success-green); }
+        .status-pill.pending { background-color: rgba(255, 138, 0, 0.1); color: var(--secondary-orange); }
+
+        .history-card-body h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .history-card-body p {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* --- AVALIAÇÕES FEITAS --- */
+        .review-row-card {
+            background-color: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .review-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .review-target-pro {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .review-stars-val {
+            color: var(--star-gold);
+            font-size: 11px;
+        }
+
+        .review-row-card p.comment-body {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.4;
+        }
+
+        /* --- BOTÃO FLUTUANTE VOLTAR HOME --- */
+        .home-floating-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(10, 57, 138, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+
+
+
+
+
+
+
+/* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+
+
+
+        /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Bloco Principal do Topo com Foto e Nome -->
+    <div class="profile-header-card">
+        <div class="profile-avatar-wrapper">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" alt="Sandra Silva">
+            <div class="edit-badge" onclick="alert('Funcionalidade de alterar foto de perfil.')">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+        </div>
+        <h2>Sandra Silva</h2>
+        <p class="location-subtitle">
+            <i class="fa-solid fa-location-dot"></i> Maianga, Luanda
+        </p>
+    </div>
+
+    <!-- Abas de Navegação -->
+    <div class="profile-tabs-nav">
+        <button class="tab-trigger active" onclick="switchProfileTab(event, 'pane-history')">Pedidos</button>
+        <button class="tab-trigger" onclick="switchProfileTab(event, 'pane-favs')">Favoritos</button>
+        <button class="tab-trigger" onclick="switchProfileTab(event, 'pane-reviews')">Avaliações</button>
+    </div>
+
+    <!-- PAINEL 1: HISTÓRICO DE PEDIDOS -->
+    <div id="pane-history" class="tab-content-panel active">
+        <div class="history-list">
+            <!-- Pedido 1 -->
+            <div class="history-card">
+                <div class="history-card-top">
+                    <span class="date">Hoje às 14:30</span>
+                    <span class="status-pill pending">Pendente</span>
+                </div>
+                <div class="history-card-body">
+                    <h4>Reparação de Curto-Circuito</h4>
+                    <p>Profissional: António Nzage</p>
+                </div>
+            </div>
+            <!-- Pedido 2 -->
+            <div class="history-card">
+                <div class="history-card-top">
+                    <span class="date">04/07/2026</span>
+                    <span class="status-pill done">Concluído</span>
+                </div>
+                <div class="history-card-body">
+                    <h4>Manutenção Preventiva AC</h4>
+                    <p>Profissional: Carlos Manuel</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL 2: FAVORITOS (Atalho Dinâmico) -->
+    <div id="pane-favs" class="tab-content-panel">
+        <div style="text-align: center; padding: 20px 0;">
+            <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 14px;">Gerencie os seus prestadores de serviços salvos na página dedicada.</p>
+            <a href="favoritos.html" style="color: var(--secondary-orange); font-size: 14px; font-weight: 700; text-decoration: none;">
+                Abrir Meus Favoritos <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- PAINEL 3: AVALIAÇÕES FEITAS -->
+    <div id="pane-reviews" class="tab-content-panel">
+        <!-- Avaliação 1 -->
+        <div class="review-row-card">
+            <div class="review-row-header">
+                <span class="review-target-pro">António Nzage</span>
+                <div class="review-stars-val">
+                    <i class="fa-solid fa-star"></i> 5.0
+                </div>
+            </div>
+            <p class="comment-body">Identificou o curto-circuito muito rápido e deixou tudo limpo. Recomendo imenso!</p>
+        </div>
+    </div>
+
+
+
+    <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pesquisa.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Lista</span>
+        </a>
+        <a href="historico.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Histórico</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-cliente.html" class="nav-item-tab active">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Lógica de Alternância das Abas do Perfil
+        function switchProfileTab(event, paneId) {
+            const triggers = document.querySelectorAll('.tab-trigger');
+            triggers.forEach(t => t.classList.remove('active'));
+
+            const panels = document.querySelectorAll('.tab-content-panel');
+            panels.forEach(p => p.classList.remove('active'));
+
+            event.currentTarget.classList.add('active');
+            document.getElementById(paneId).classList.add('active');
+        }
+    </script>
+</body>
+</html>

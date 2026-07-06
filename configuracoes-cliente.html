@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Configurações</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Modos de Cores Variáveis (Padrão: Claro) */
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #1E293B;
+            --text-sub: #64748B;
+            --border-line: #E2E8F0;
+            
+            /* Cores de Identidade Fixas */
+            --primary-blue: #0A398A;
+            --secondary-orange: #FF8A00;
+        }
+
+        /* Classe injetada via JS para o Modo Escuro */
+        .dark-theme {
+            --bg-body: #0F172A;
+            --bg-card: #1E293B;
+            --text-main: #F8FAFC;
+            --text-sub: #94A3B8;
+            --border-line: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-bottom: 40px;
+        }
+
+        /* --- NAVEGAÇÃO SUPERIOR --- */
+        .top-nav-bar {
+            background-color: var(--bg-card);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-line);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--text-main);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .top-nav-bar h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* --- AGRUPAMENTOS DE OPÇÕES --- */
+        .settings-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .settings-block-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .settings-group-box {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-line);
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+        }
+
+        /* Linha de Opção */
+        .settings-row-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-line);
+            text-decoration: none;
+            color: var(--text-main);
+            cursor: pointer;
+            background: none;
+            width: 100%;
+            border-left: none; border-right: none; border-top: none;
+            text-align: left;
+        }
+
+        .settings-row-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-row-item:active {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        .dark-theme .settings-row-item:active {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .row-left-side {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .row-left-side i.icon-lead {
+            font-size: 16px;
+            color: var(--primary-blue);
+            width: 20px;
+            text-align: center;
+        }
+        .dark-theme .row-left-side i.icon-lead {
+            color: var(--secondary-orange);
+        }
+
+        .row-label-text h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .row-label-text p {
+            font-size: 11px;
+            color: var(--text-sub);
+            margin-top: 1px;
+        }
+
+        /* Indicadores de Direção / Ação Direita */
+        .row-right-side {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-sub);
+            font-size: 13px;
+        }
+
+        /* --- COMPONENTES NATIVOS DE INTERFACE --- */
+        /* Interruptor Toggle Switch */
+        .switch-toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch-toggle input {
+            opacity: 0; width: 0; height: 0;
+        }
+
+        .slider-round {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #CBD5E1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider-round:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-round {
+            background-color: #10B981;
+        }
+
+        input:checked + .slider-round:before {
+            transform: translateX(20px);
+        }
+
+        /* Menu de Seleção Customizado Mínimo */
+        .select-language-native {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            padding-right: 4px;
+        }
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+
+
+
+         /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- Navegação Superior -->
+    <div class="top-nav-bar">
+        <h2>Configurações</h2>
+    </div>
+
+    <!-- Contentor de Opções -->
+    <div class="settings-container">
+        
+        <!-- BLOCO 1: CONTA & PERFIL -->
+        <div>
+            <h3 class="settings-block-title">Minha Conta</h3>
+            <div class="settings-group-box">
+                <!-- Editar Perfil -->
+                <div class="settings-row-item" onclick="window.location.href='editar-perfil-cliente.html'">
+    <div class="row-left-side">
+        <i class="fa-solid fa-user-gear icon-lead"></i>
+        <div class="row-label-text">
+            <h4>Editar Perfil</h4>
+            <p>Nome, foto de perfil, número e localização</p>
+        </div>
+    </div>
+    <div class="row-right-side">
+        <i class="fa-solid fa-chevron-right"></i>
+    </div>
+</div>
+
+                <!-- Alterar Senha -->
+                <div class="settings-row-item" onclick="window.location.href='alterar-senha-cliente.html'">
+    <div class="row-left-side">
+        <i class="fa-solid fa-lock icon-lead"></i>
+        <div class="row-label-text">
+            <h4>Alterar Senha</h4>
+            <p>Atualize os dados de acesso à sua conta</p>
+        </div>
+    </div>
+    <div class="row-right-side">
+        <i class="fa-solid fa-chevron-right"></i>
+    </div>
+</div>
+
+
+
+            </div>
+        </div>
+
+        <!-- BLOCO 2: PREFERÊNCIAS DO APLICATIVO -->
+        <div>
+            <h3 class="settings-block-title">Preferências</h3>
+            <div class="settings-group-box">
+                <!-- Tema Claro / Escuro -->
+                <div class="settings-row-item">
+                    <div class="row-left-side">
+                        <i class="fa-solid fa-moon icon-lead"></i>
+                        <div class="row-label-text">
+                            <h4>Modo Escuro</h4>
+                            <p>Alternar visual para ambientes escuros</p>
+                        </div>
+                    </div>
+                    <div class="row-right-side">
+                        <label class="switch-toggle">
+                            <input type="checkbox" id="themeToggleButton" onchange="toggleThemeMode(this)">
+                            <span class="slider-round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Idioma -->
+                <div class="settings-row-item">
+                    <div class="row-left-side">
+                        <i class="fa-solid fa-globe icon-lead"></i>
+                        <div class="row-label-text">
+                            <h4>Idioma da Interface</h4>
+                            <p>Escolha a sua língua de preferência</p>
+                        </div>
+                    </div>
+                    <div class="row-right-side">
+                        <select class="select-language-native" onchange="alert('Idioma alterado para: ' + this.value)">
+                            <option value="pt-BR" selected>Português (BR)</option>
+                            <option value="pt-PT">Português (PT)</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 3: SEGURANÇA E DADOS -->
+        <div>
+            <h3 class="settings-block-title">Segurança</h3>
+            <div class="settings-group-box">
+                <!-- Privacidade -->
+                <div class="settings-row-item">
+                    <div class="row-left-side">
+                        <i class="fa-solid fa-eye-slash icon-lead"></i>
+                        <div class="row-label-text">
+                            <h4>Perfil Público</h4>
+                            <p>Permitir que outros utilizadores vejam o meu histórico</p>
+                        </div>
+                    </div>
+                    <div class="row-right-side">
+                        <label class="switch-toggle">
+                            <input type="checkbox" checked onchange="alert('Preferência de privacidade atualizada.')">
+                            <span class="slider-round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+     <!-- Menu de Navegação Inferior Profissional -->
+    <div class="bottom-nav-bar">
+        <a href="home.html" class="nav-item-tab">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Home</span>
+        </a>
+        <a href="pesquisa.html" class="nav-item-tab">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Lista</span>
+        </a>
+        <a href="historico.html" class="nav-item-tab">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Histórico</span>
+        </a>
+        <a href="chat.html" class="nav-item-tab">
+            <i class="fa-solid fa-message"></i>
+            <span>Chat</span>
+        </a>
+        <a href="perfil-cliente.html" class="nav-item-tab">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Perfil</span>
+        </a>
+    </div>
+
+    <script>
+        // Lógica de Alternância de Temas Dinâmicos (Claro/Escuro)
+        function toggleThemeMode(checkboxElement) {
+            if (checkboxElement.checked) {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+        }
+
+        // Auto-deteta se o sistema já prefere o esquema de cores escuro por padrão
+        window.addEventListener('DOMContentLoaded', () => {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDark) {
+                document.getElementById('themeToggleButton').checked = true;
+                document.body.classList.add('dark-theme');
+            }
+        });
+    </script>
+</body>
+</html>

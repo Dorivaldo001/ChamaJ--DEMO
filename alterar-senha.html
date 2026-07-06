@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Alterar Senha</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --danger-red: #EF4444;
+            --warning-yellow: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding: 20px 20px 40px 20px;
+        }
+
+        /* --- CABEÇALHO --- */
+        .header-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .back-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .header-section h2 {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        /* --- FORMULÁRIO --- */
+        .form-container {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .input-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            height: 48px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 44px 0 14px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary-blue);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            color: var(--text-gray);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        /* --- MEDIDOR DE FORÇA DA SENHA --- */
+        .strength-container {
+            margin-top: -8px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 6px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .strength-segment {
+            flex: 1;
+            height: 100%;
+            background-color: transparent;
+            transition: background-color 0.3s ease;
+        }
+
+        .password-rules {
+            font-size: 11px;
+            color: var(--text-gray);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-left: 2px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .rule-item i {
+            font-size: 10px;
+        }
+
+        .rule-item.valid {
+            color: var(--success-green);
+        }
+
+        /* --- BOTÃO --- */
+        .btn-orange-submit {
+            width: 100%;
+            height: 52px;
+            background-color: var(--secondary-orange);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 138, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-orange-submit:active { background-color: #E07A00; }
+        .btn-orange-submit:disabled {
+            background-color: #CBD5E1;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* --- MODAL --- */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .modal-card {
+            background-color: white;
+            border-radius: 24px;
+            padding: 30px 24px;
+            text-align: center;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-icon-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            margin: 0 auto 20px auto;
+        }
+
+        .modal-card h4 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .modal-card p {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <div class="header-section">
+        <a href="configuracoes.html" class="back-btn">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <h2>Alterar Senha</h2>
+    </div>
+
+    <!-- Formulário de Segurança -->
+    <div class="form-container">
+        <!-- Senha Atual -->
+        <div class="input-group">
+            <label>Senha Atual</label>
+            <div class="input-wrapper">
+                <input type="password" id="currentPassword" placeholder="Introduz a senha atual">
+                <i class="fa-regular fa-eye toggle-password" onclick="toggleVisibility('currentPassword', this)"></i>
+            </div>
+        </div>
+
+        <!-- Nova Senha -->
+        <div class="input-group">
+            <label>Nova Senha</label>
+            <div class="input-wrapper">
+                <input type="password" id="newPassword" placeholder="Cria uma nova senha" oninput="validatePassword()">
+                <i class="fa-regular fa-eye toggle-password" onclick="toggleVisibility('newPassword', this)"></i>
+            </div>
+        </div>
+
+        <!-- Barra Visual de Força -->
+        <div class="strength-container">
+            <div class="strength-bar">
+                <div class="strength-segment" id="seg1"></div>
+                <div class="strength-segment" id="seg2"></div>
+                <div class="strength-segment" id="seg3"></div>
+            </div>
+            <!-- Regras Dinâmicas -->
+            <div class="password-rules">
+                <div class="rule-item" id="ruleLength"><i class="fa-solid fa-circle"></i> Pelo menos 8 caracteres</div>
+                <div class="rule-item" id="ruleNumber"><i class="fa-solid fa-circle"></i> Pelo menos um número</div>
+                <div class="rule-item" id="ruleUpper"><i class="fa-solid fa-circle"></i> Pelo menos uma letra maiúscula</div>
+            </div>
+        </div>
+
+        <!-- Verificar/Confirmar Senha -->
+        <div class="input-group">
+            <label>Confirmar Nova Senha</label>
+            <div class="input-wrapper">
+                <input type="password" id="confirmPassword" placeholder="Repete a nova senha" oninput="checkMatch()">
+                <i class="fa-regular fa-eye toggle-password" onclick="toggleVisibility('confirmPassword', this)"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão de Guardar Alterações -->
+    <button class="btn-orange-submit" id="submitBtn" onclick="atualizarSenha()" disabled>
+        <i class="fa-solid fa-key"></i> Atualizar Senha
+    </button>
+
+    <!-- MODAL DE SUCESSO -->
+    <div class="modal-backdrop" id="successModal">
+        <div class="modal-card">
+            <div class="modal-icon-circle">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h4>Senha Alterada!</h4>
+            <p>A tua credencial de acesso foi atualizada com sucesso. Utiliza a nova senha no teu próximo início de sessão.</p>
+        </div>
+    </div>
+
+    <!-- INTERATIVIDADE E VALIDAÇÕES -->
+    <script>
+        let isPasswordStrong = false;
+        let isPasswordMatching = false;
+
+        // Alternar visibilidade de texto (Ver/Ocultar Senha)
+        function toggleVisibility(id, icon) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.className = "fa-regular fa-eye-slash toggle-password";
+            } else {
+                input.type = "password";
+                icon.className = "fa-regular fa-eye toggle-password";
+            }
+        }
+
+        // Validação da Força da Senha com Regras Estritas
+        function validatePassword() {
+            const pass = document.getElementById('newPassword').value;
+            
+            const hasLength = pass.length >= 8;
+            const hasNumber = /\d/.test(pass);
+            const hasUpper = /[A-Z]/.test(pass);
+
+            // Atualiza os indicadores das regras visuais
+            updateRuleVisual('ruleLength', hasLength);
+            updateRuleVisual('ruleNumber', hasNumber);
+            updateRuleVisual('ruleUpper', hasUpper);
+
+            // Contagem de critérios aceites
+            let score = 0;
+            if (hasLength) score++;
+            if (hasNumber) score++;
+            if (hasUpper) score++;
+
+            // Atualiza a barra de progresso tripartida
+            const seg1 = document.getElementById('seg1');
+            const seg2 = document.getElementById('seg2');
+            const seg3 = document.getElementById('seg3');
+
+            // Reset das cores
+            seg1.style.backgroundColor = 'transparent';
+            seg2.style.backgroundColor = 'transparent';
+            seg3.style.backgroundColor = 'transparent';
+
+            if (score === 1) {
+                seg1.style.backgroundColor = 'var(--danger-red)'; // Fraca
+                isPasswordStrong = false;
+            } else if (score === 2) {
+                seg1.style.backgroundColor = 'var(--warning-yellow)'; // Média
+                seg2.style.backgroundColor = 'var(--warning-yellow)';
+                isPasswordStrong = false; // Bloqueia senhas médias se quiseres segurança total, ou define como true se aceitares média
+            } else if (score === 3) {
+                seg1.style.backgroundColor = 'var(--success-green)'; // Forte
+                seg2.style.backgroundColor = 'var(--success-green)';
+                seg3.style.backgroundColor = 'var(--success-green)';
+                isPasswordStrong = true;
+            } else {
+                isPasswordStrong = false;
+            }
+
+            checkMatch(); // Revalida a correspondência caso mude a senha principal
+        }
+
+        function updateRuleVisual(id, isValid) {
+            const element = document.getElementById(id);
+            if (isValid) {
+                element.classList.add('valid');
+                element.querySelector('i').className = "fa-solid fa-circle-check";
+            } else {
+                element.classList.remove('valid');
+                element.querySelector('i').className = "fa-solid fa-circle";
+            }
+        }
+
+        // Verifica se a confirmação é idêntica à nova senha
+        function checkMatch() {
+            const pass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            const confirmInput = document.getElementById('confirmPassword');
+
+            if (confirmPass.length > 0) {
+                if (pass === confirmPass) {
+                    confirmInput.style.borderColor = 'var(--success-green)';
+                    isPasswordMatching = true;
+                } else {
+                    confirmInput.style.borderColor = 'var(--danger-red)';
+                    isPasswordMatching = true;
+                    isPasswordMatching = false;
+                }
+            } else {
+                confirmInput.style.borderColor = 'var(--border-color)';
+                isPasswordMatching = false;
+            }
+
+            toggleSubmitButton();
+        }
+
+        // Ativa ou desativa o botão de envio
+        function toggleSubmitButton() {
+            const currentPass = document.getElementById('currentPassword').value;
+            const btn = document.getElementById('submitBtn');
+
+            if (currentPass.length > 0 && isPasswordStrong && isPasswordMatching) {
+                btn.removeAttribute('disabled');
+            } else {
+                btn.setAttribute('disabled', 'true');
+            }
+        }
+
+        // Adiciona ouvinte na senha atual para verificar ativação do botão
+        document.getElementById('currentPassword').oninput = toggleSubmitButton;
+
+        // Submissão bem-sucedida e fecho controlado por tempo
+        function atualizarSenha() {
+            document.getElementById('successModal').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('successModal').style.display = 'none';
+                window.location.href = 'home-profissional.html';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Mensagens</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --chat-bg: #F1F5F9;
+            --bubble-in: #FFFFFF;
+            --bubble-out: #0A398A;
+            --success-green: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- VIEWS CONTROLLERS --- */
+        .view-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s ease-in-out;
+            background-color: var(--bg-light);
+        }
+
+        #listView { z-index: 2; }
+        #chatView { z-index: 1; transform: translateX(100%); }
+        #chatView.active { transform: translateX(0); z-index: 3; }
+
+        /* --- ESTRUTURA DOS TOPO --- */
+        .chat-header {
+            background-color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            gap: 14px;
+        }
+
+        .chat-header h2 { font-size: 18px; font-weight: 700; }
+        .back-btn { color: var(--text-dark); font-size: 18px; cursor: pointer; border: none; background: none; }
+
+        /* --- 1. LISTA DE CONVERSAS --- */
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .chat-row-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            background-color: white;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            cursor: pointer;
+            gap: 14px;
+        }
+
+        .chat-row-item:active { background-color: #F1F5F9; }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+        }
+
+        .avatar-wrapper img {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+        }
+
+        /* Indicador Online */
+        .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success-green);
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .row-info { flex: 1; }
+        .row-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .row-top h3 { font-size: 14px; font-weight: 700; }
+        .row-top span { font-size: 11px; color: var(--text-gray); }
+        
+        /* Indicador Digitando na lista */
+        .row-msg { font-size: 13px; color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .row-msg.typing { color: var(--success-green); font-weight: 500; }
+
+        /* --- 2. TELA DE MENSAGENS INTERNA --- */
+        .user-chat-meta { display: flex; flex-direction: column; }
+        .user-chat-meta h3 { font-size: 15px; font-weight: 700; }
+        
+        /* Indicador Digitando/Subtítulo */
+        .user-status-subtitle { font-size: 11px; color: var(--text-gray); }
+        .user-status-subtitle.typing { color: var(--success-green); font-weight: 600; }
+
+        .chat-messages-body {
+            flex: 1;
+            background-color: var(--chat-bg);
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Balões de Mensagem */
+        .msg-line { display: flex; width: 100%; }
+        .msg-line.inbound { justify-content: flex-start; }
+        .msg-line.outbound { justify-content: flex-end; }
+
+        .msg-bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .msg-line.inbound .msg-bubble {
+            background-color: var(--bubble-in);
+            color: var(--text-dark);
+            border-top-left-radius: 4px;
+        }
+
+        .msg-line.outbound .msg-bubble {
+            background-color: var(--bubble-out);
+            color: white;
+            border-top-right-radius: 4px;
+        }
+
+        /* Foto e Localização enviadas dentro do Balão */
+        .msg-bubble img.shared-photo {
+            width: 100%; max-width: 200px; border-radius: 8px; display: block; margin-bottom: 4px;
+        }
+        
+        .location-box-shared {
+            display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; font-weight: 500;
+        }
+
+        /* Reprodutor de Áudio Customizado Simples */
+        .audio-player-box {
+            display: flex; align-items: center; gap: 10px; min-width: 160px; padding: 4px 0;
+        }
+        .audio-player-box i { font-size: 16px; cursor: pointer; }
+
+        /* Meta rodapé do balão (Hora e Lido) */
+        .msg-meta-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: rgba(0,0,0,0.4);
+            margin-top: 4px;
+            text-align: right;
+        }
+        .msg-line.outbound .msg-meta-footer { color: rgba(255,255,255,0.7); }
+        
+        /* Indicador Mensagem lida (Check Duplo Azul) */
+        .msg-meta-footer i.fa-check-double { color: #38BDF8; }
+
+        /* --- BARRA DE INPUT E ENVIOS --- */
+        .chat-input-bar {
+            background-color: white;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Grupo de Anexos */
+        .attachment-trigger-actions { display: flex; gap: 10px; color: var(--text-gray); font-size: 18px; }
+        .attachment-trigger-actions label, .attachment-trigger-actions i { cursor: pointer; padding: 4px; }
+        .attachment-trigger-actions label input { display: none; }
+
+        .input-message-field {
+            flex: 1;
+            background-color: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-send-message {
+            width: 40px; height: 40px;
+            background-color: var(--secondary-orange);
+            color: white; border: none; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 16px; cursor: pointer;
+            box-shadow: 0 2px 6px rgba(255, 138, 0, 0.3);
+        }
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+
+
+
+
+
+
+
+         /* --- MENU INFERIOR FIXO --- */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 68px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: 200;
+        }
+
+        .nav-item-tab {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item-tab.active { color: var(--primary-blue); }
+        .nav-item-tab i { font-size: 18px; }
+
+                body {
+    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
+    padding-bottom: 100px; 
+}
+    </style>
+</head>
+<body>
+
+    <!-- ================= 1. VISTA: LISTA DE CONVERSAS ================= -->
+    <div id="listView" class="view-panel">
+        <div class="chat-header">
+            <h2>Mensagens</h2>
+        </div>
+        
+        <div class="conversations-list">
+            <!-- Linha de Conversa 1 -->
+            <div class="chat-row-item" onclick="openChatRoom('António Nzage', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', true)">
+                <div class="avatar-wrapper">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" alt="Avatar">
+                    <div class="status-dot"></div> <!-- Indicador Online -->
+                </div>
+                <div class="row-info">
+                    <div class="row-top">
+                        <h3>António Nzage</h3>
+                        <span>09:41</span>
+                    </div>
+                    <!-- Indicador Digitando dinâmico na lista -->
+                    <p class="row-msg typing" id="listStatusText">Digitando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= 2. VISTA: TELA DE MENSAGENS INTERNA ================= -->
+    <div id="chatView" class="view-panel">
+        <div class="chat-header">
+            <button class="back-btn" onclick="closeChatRoom()"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="avatar-wrapper" style="width: 38px; height: 38px;">
+                <img src="" id="chatViewAvatar" alt="Avatar">
+            </div>
+            <div class="user-chat-meta">
+                <h3 id="chatViewName">Profissional</h3>
+                <!-- Indicador Online / Digitando Interno -->
+                <span class="user-status-subtitle typing" id="chatViewStatus">Digitando...</span>
+            </div>
+        </div>
+
+        <!-- Corpo das Mensagens -->
+        <div class="chat-messages-body" id="chatBoxContainer">
+            
+            <!-- Mensagem Recebida (Texto + Indicador Lido na de fora) -->
+            <div class="msg-line inbound">
+                <div class="msg-bubble">
+                    Olá! O orçamento fica pronto em 20 minutos.
+                    <div class="msg-meta-footer">09:38</div>
+                </div>
+            </div>
+
+            <!-- Mensagem Enviada (Texto + Indicador Mensagem lida check duplo) -->
+            <div class="msg-line outbound">
+                <div class="msg-bubble">
+                    Perfeito, fico a aguardar aqui na Maianga.
+                    <div class="msg-meta-footer">
+                        09:39 <i class="fa-solid fa-check-double"></i> <!-- Indicador Lido -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exemplo de Foto Enviada -->
+            <div class="msg-line outbound">
+                <div class="msg-bubble">
+                    <img src="https://images.unsplash.com/photo-1621905252507-b354bc25edac?w=300" class="shared-photo" alt="Foto">
+                    Aqui está o detalhe do quadro elétrico antigo.
+                    <div class="msg-meta-footer">09:40 <i class="fa-solid fa-check-double"></i></div>
+                </div>
+            </div>
+
+            <!-- Exemplo de Áudio Enviado -->
+            <div class="msg-line inbound">
+                <div class="msg-bubble">
+                    <div class="audio-player-box">
+                        <i class="fa-solid fa-play" onclick="alert('A reproduzir áudio gravado...')"></i>
+                        <span style="font-size: 12px;">Mensagem de voz (0:14)</span>
+                    </div>
+                    <div class="msg-meta-footer">09:41</div>
+                </div>
+            </div>
+
+            <!-- Exemplo de Localização Enviada -->
+            <div class="msg-line outbound">
+                <div class="msg-bubble">
+                    <a href="https://maps.google.com" target="_blank" class="location-box-shared">
+                        <i class="fa-solid fa-map-location-dot" style="font-size: 20px;"></i>
+                        <span>Localização partilhada</span>
+                    </a>
+                    <div class="msg-meta-footer">09:41 <i class="fa-solid fa-check-double"></i></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Barra Inferior de Entrada e Controlos -->
+        <div class="chat-input-bar">
+            <!-- Ações de Envio Multimédia -->
+            <div class="attachment-trigger-actions">
+                <!-- Foto -->
+                <label title="Enviar Foto">
+                    <i class="fa-solid fa-camera"></i>
+                    <input type="file" accept="image/*" onchange="sendPhotoPlaceholder(this)">
+                </label>
+                <!-- Localização -->
+                <i class="fa-solid fa-location-dot" title="Partilhar Localização" onclick="sendLocationPlaceholder()"></i>
+                <!-- Áudio -->
+                <i class="fa-solid fa-microphone" title="Gravar Áudio" onclick="sendAudioPlaceholder()"></i>
+            </div>
+
+            <!-- Input de Texto -->
+            <input type="text" class="input-message-field" id="msgInputField" placeholder="Escreva uma mensagem...">
+
+            <!-- Botão Enviar -->
+            <button class="btn-send-message" onclick="sendTextMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <script>
+        // Transição: Abrir a Sala de Chat
+        function openChatRoom(name, avatarUrl, isTyping) {
+            document.getElementById('chatViewName').textContent = name;
+            document.getElementById('chatViewAvatar').src = avatarUrl;
+            
+            const statusSubtitle = document.getElementById('chatViewStatus');
+            if(isTyping) {
+                statusSubtitle.textContent = "Digitando...";
+                statusSubtitle.classList.add('typing');
+            } else {
+                statusSubtitle.textContent = "Online";
+                statusSubtitle.classList.remove('typing');
+            }
+            
+            document.getElementById('chatView').classList.add('active');
+            scrollToBottom();
+            
+            // Simulação simples: desliga o "digitando" após 5 segundos logado no chat
+            setTimeout(() => {
+                if(statusSubtitle.textContent === "Digitando...") {
+                    statusSubtitle.textContent = "Online";
+                    statusSubtitle.classList.remove('typing');
+                    document.getElementById('listStatusText').textContent = "Online";
+                    document.getElementById('listStatusText').classList.remove('typing');
+                }
+            }, 5000);
+        }
+
+        // Transição: Fechar e Voltar para a Lista
+        function closeChatRoom() {
+            document.getElementById('chatView').classList.remove('active');
+        }
+
+        // Função de scroll automático para ver a última mensagem
+        function scrollToBottom() {
+            const box = document.getElementById('chatBoxContainer');
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // AÇÃO: Enviar Mensagem de Texto
+        function sendTextMessage() {
+            const input = document.getElementById('msgInputField');
+            const txt = input.value.trim();
+            if(!txt) return;
+
+            const html = `
+                <div class="msg-line outbound">
+                    <div class="msg-bubble">
+                        ${txt}
+                        <div class="msg-meta-footer">Agora <i class="fa-solid fa-check"></i></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('chatBoxContainer').insertAdjacentHTML('beforeend', html);
+            input.value = "";
+            scrollToBottom();
+        }
+
+        // AÇÃO: Disparar Foto (Placeholder)
+        function sendPhotoPlaceholder(input) {
+            if(input.files && input.files[0]) {
+                alert("Simulação: Imagem selecionada pronta para processamento e upload.");
+                const html = `
+                    <div class="msg-line outbound">
+                        <div class="msg-bubble">
+                            <i class="fa-solid fa-image" style="font-size:20px; margin-right:6px;"></i> Upload de Imagem...
+                            <div class="msg-meta-footer">Agora</div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('chatBoxContainer').insertAdjacentHTML('beforeend', html);
+                scrollToBottom();
+            }
+        }
+
+        // AÇÃO: Disparar Localização (Placeholder)
+        function sendLocationPlaceholder() {
+            const confirmar = confirm("Desejas partilhar a tua localização atual no chat?");
+            if(confirmar) {
+                const html = `
+                    <div class="msg-line outbound">
+                        <div class="msg-bubble">
+                            <a href="#" class="location-box-shared" onclick="return false;">
+                                <i class="fa-solid fa-map-location-dot" style="font-size: 20px;"></i>
+                                <span>Localização Atual Partilhada</span>
+                            </a>
+                            <div class="msg-meta-footer">Agora <i class="fa-solid fa-check"></i></div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('chatBoxContainer').insertAdjacentHTML('beforeend', html);
+                scrollToBottom();
+            }
+        }
+
+        // AÇÃO: Disparar Áudio (Placeholder)
+        function sendAudioPlaceholder() {
+            alert("A iniciar a captura do gravador de voz...");
+            setTimeout(() => {
+                const html = `
+                    <div class="msg-line outbound">
+                        <div class="msg-bubble">
+                            <div class="audio-player-box">
+                                <i class="fa-solid fa-play" onclick="alert('Reproduzindo áudio...')"></i>
+                                <span style="font-size: 12px;">Áudio enviado (0:05)</span>
+                            </div>
+                            <div class="msg-meta-footer">Agora <i class="fa-solid fa-check"></i></div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('chatBoxContainer').insertAdjacentHTML('beforeend', html);
+                scrollToBottom();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Gerir Portfólio</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --primary-dark: #062459;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --danger-red: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding: 20px 20px 40px 20px;
+        }
+
+        /* --- CABEÇALHO --- */
+        .header-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .back-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .header-section h2 {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- CONTAINER DE FORMULÁRIO --- */
+        .portfolio-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .input-group textarea {
+            resize: none;
+            height: 90px;
+        }
+
+        /* --- ZONAS DE UPLOAD COLETIVO --- */
+        .upload-zone-wrapper {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .media-upload-box {
+            background-color: var(--bg-light);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .media-upload-box input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .media-upload-box i {
+            font-size: 22px;
+            color: var(--text-gray);
+            margin-bottom: 6px;
+        }
+
+        .media-upload-box p {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .media-upload-box span {
+            font-size: 10px;
+            color: var(--text-gray);
+        }
+
+        /* --- PREVIEW GRID --- */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .delete-preview-btn {
+            position: absolute;
+            top: 4px; right: 4px;
+            background-color: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- ANTES E DEPOIS GRID --- */
+        .before-after-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .ba-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            aspect-ratio: 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .ba-box img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .ba-badge {
+            position: absolute;
+            top: 8px; left: 8px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .ba-box input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer; z-index: 3;
+        }
+
+        /* --- BOTÃO DE SUBMISSÃO --- */
+        .btn-orange-submit {
+            width: 100%;
+            height: 52px;
+            background-color: var(--secondary-orange);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 138, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-orange-submit:active { background-color: #E07A00; }
+
+        /* --- MODAL DE SUCESSO --- */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .modal-card {
+            background-color: white;
+            border-radius: 24px;
+            padding: 30px 24px;
+            text-align: center;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-icon-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            margin: 0 auto 20px auto;
+        }
+
+        .modal-card h4 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .modal-card p {
+            font-size: 13px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <div class="header-section">
+        <a href="configuracoes.html" class="back-btn">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <h2>Gerir Portfólio</h2>
+    </div>
+
+    <!-- Bloco 1: Novo Trabalho Geral -->
+    <div class="section-title"><i class="fa-solid fa-folder-plus" style="color:var(--primary-blue)"></i> Adicionar Trabalho</div>
+    <div class="portfolio-card">
+        <div class="input-group">
+            <label>Título do Projeto / Serviço</label>
+            <input type="text" id="projTitle" placeholder="Ex: Pintura Residencial Condomínio">
+        </div>
+
+        <div class="input-group">
+            <label>Descrição do Trabalho realizado</label>
+            <textarea id="projDesc" placeholder="Explica resumidamente o que fizeste, materiais usados ou detalhes técnicos importantes para impressionar o cliente..."></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Carregar Fotos ou Vídeos</label>
+            <div class="upload-zone-wrapper">
+                <!-- Caixa de Upload de Média -->
+                <div class="media-upload-box">
+                    <input type="file" id="mediaInput" accept="image/*,video/*" multiple onchange="previewMedia(this)">
+                    <i class="fa-solid fa-images"></i>
+                    <p>Escolher Ficheiros</p>
+                    <span>Fotos ou Vídeos</span>
+                </div>
+            </div>
+            <!-- Grelha de Miniaturas Carregadas -->
+            <div class="preview-grid" id="generalPreviewGrid"></div>
+        </div>
+    </div>
+
+    <!-- Bloco 2: Antes e Depois (Transformação) -->
+    <div class="section-title"><i class="fa-solid fa-images" style="color:var(--secondary-orange)"></i> Projeto Antes e Depois</div>
+    <div class="portfolio-card">
+        <div class="input-group">
+            <label>Título da Transformação</label>
+            <input type="text" id="baTitle" placeholder="Ex: Renovação de Cozinha Antiga">
+        </div>
+
+        <div class="before-after-container">
+            <!-- Caixa Antes -->
+            <div class="ba-box" id="baAntesBox">
+                <span class="ba-badge">Antes</span>
+                <input type="file" accept="image/*" onchange="previewBeforeAfter(this, 'antes')">
+                <i class="fa-solid fa-camera" style="font-size:20px; color:var(--text-gray); margin-bottom:4px;"></i>
+                <span style="font-size:11px; color:var(--text-gray);">Carregar foto</span>
+            </div>
+
+            <!-- Caixa Depois -->
+            <div class="ba-box" id="baDepoisBox">
+                <span class="ba-badge" style="background-color: var(--success-green);">Depois</span>
+                <input type="file" accept="image/*" onchange="previewBeforeAfter(this, 'depois')">
+                <i class="fa-solid fa-camera" style="font-size:20px; color:var(--text-gray); margin-bottom:4px;"></i>
+                <span style="font-size:11px; color:var(--text-gray);">Carregar foto</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão de Publicação Pública -->
+    <button class="btn-orange-submit" onclick="publicarPortfolio()">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Publicar no Portfólio
+    </button>
+
+    <!-- MODAL DE SUCESSO (FECHO AUTOMÁTICO) -->
+    <div class="modal-backdrop" id="portfolioSuccessModal">
+        <div class="modal-card">
+            <div class="modal-icon-circle">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h4>Portfólio Atualizado!</h4>
+            <p>O teu trabalho foi publicado com sucesso e já está visível para todos os clientes que visitarem o teu perfil profissional.</p>
+        </div>
+    </div>
+
+    <!-- LÓGICA INTERATIVA -->
+    <script>
+        // 1. Mostrar fotos/vídeos na grelha comum de pré-visualização
+        function previewMedia(input) {
+            const grid = document.getElementById('generalPreviewGrid');
+            
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+                        
+                        // Verifica se o ficheiro é vídeo ou imagem
+                        if (file.type.startsWith('video/')) {
+                            div.innerHTML = `
+                                <video src="${e.target.result}" muted autoplay loop></video>
+                                <button class="delete-preview-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+                            `;
+                        } else {
+                            div.innerHTML = `
+                                <img src="${e.target.result}" alt="Preview">
+                                <button class="delete-preview-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+                            `;
+                        }
+                        grid.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        // 2. Mostrar fotos nas caixas fixas do Antes e Depois
+        function previewBeforeAfter(input, tipo) {
+            const container = tipo === 'antes' ? document.getElementById('baAntesBox') : document.getElementById('baDepoisBox');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Limpa ícones e textos antigos mantendo apenas a etiqueta (badge)
+                    const badgeHTML = container.querySelector('.ba-badge').outerHTML;
+                    container.innerHTML = `
+                        ${badgeHTML}
+                        <input type="file" accept="image/*" onchange="previewBeforeAfter(this, '${tipo}')">
+                        <img src="${e.target.result}" alt="${tipo}">
+                    `;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // 3. Simulação de gravação e publicação do Portfólio
+        function publicarPortfolio() {
+            // Mostra o Modal de Confirmação
+            document.getElementById('portfolioSuccessModal').style.display = 'flex';
+
+            // Fecha automaticamente após 4 segundos e retorna ao perfil do profissional
+            setTimeout(() => {
+                document.getElementById('portfolioSuccessModal').style.display = 'none';
+                window.location.href = 'home-profissional.html';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

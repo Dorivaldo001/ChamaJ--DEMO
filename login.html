@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChamaJá - Login</title>
+    <!-- Font Awesome para os Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A398A;
+            --secondary-orange: #FF8A00;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --bg-light: #F8FAFC;
+            --border-color: #E2E8F0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--primary-blue);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Topo Azul com Boas-vindas e Mini Logo */
+        .top-hero-section {
+            padding: 50px 24px 30px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .welcome-text h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+        }
+
+        .welcome-text p span {
+            color: var(--secondary-orange);
+            font-weight: 700;
+        }
+
+        /* Miniatura do Logo Circular no Topo */
+        .mini-logo-box {
+            width: 85px;
+            height: 85px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            padding: 5px;
+            flex-shrink: 0;
+            border: 3px solid var(--secondary-orange);
+        }
+
+        .mini-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Container Principal do Conteúdo Base (Branco) */
+        .content-body {
+            background-color: var(--bg-light);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            flex-grow: 1;
+            width: 100%;
+            padding: 0 20px 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Card de Login Flutuante Superposto */
+        .login-card-floating {
+            background-color: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 410px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            margin-top: -20px; /* Faz o efeito de sobreposição no bloco azul */
+            margin-bottom: 30px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.input-icon {
+            position: absolute;
+            left: 16px;
+            color: #A0AEC0;
+            font-size: 16px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 15px 16px 15px 46px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background-color: #FAFAFA;
+            color: var(--text-dark);
+        }
+
+        .input-wrapper input:focus {
+            border-color: #CBD5E1;
+            background-color: white;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            color: #A0AEC0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .forgot-password-link {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            margin-bottom: 25px;
+        }
+
+        /* Botões de Ação do Card */
+        .btn-orange-submit {
+            width: 100%;
+            background-color: var(--secondary-orange);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 138, 0, 0.2);
+            transition: background-color 0.2s;
+        }
+
+        .btn-orange-submit:active {
+            background-color: #E27B00;
+        }
+
+        .divider-text {
+            text-align: center;
+            margin: 18px 0;
+            font-size: 13px;
+            color: var(--text-gray);
+            position: relative;
+        }
+
+        .divider-text::before, .divider-text::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+        .divider-text::before { left: 0; }
+        .divider-text::after { right: 0; }
+
+        .btn-outline-register {
+            width: 100%;
+            background: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-outline-register:active {
+            background-color: rgba(10, 57, 138, 0.05);
+        }
+
+        /* Secção Inferior: Entrar Como */
+        .role-selector-section {
+            width: 100%;
+            max-width: 410px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .role-selector-section p.section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .role-grid-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .role-card-btn {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .role-card-btn i {
+            font-size: 26px;
+            color: #94A3B8;
+        }
+
+        .role-card-btn span {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-gray);
+        }
+
+        /* Estado Ativo Combinado (Profissional: Azul | Cliente: Laranja) */
+        .role-card-btn.active[data-role="profissional"] {
+            border-color: var(--primary-blue);
+            box-shadow: 0 6px 15px rgba(10, 57, 138, 0.12);
+        }
+        .role-card-btn.active[data-role="profissional"] i, 
+        .role-card-btn.active[data-role="profissional"] span {
+            color: var(--primary-blue);
+        }
+
+        .role-card-btn.active[data-role="cliente"] {
+            border-color: var(--secondary-orange);
+            box-shadow: 0 6px 15px rgba(255, 138, 0, 0.12);
+        }
+        .role-card-btn.active[data-role="cliente"] i, 
+        .role-card-btn.active[data-role="cliente"] span {
+            color: var(--secondary-orange);
+        }
+
+        /* Termos Legais no Rodapé */
+        .legal-footer {
+            max-width: 320px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin-top: auto;
+        }
+
+        .legal-footer a {
+            color: var(--primary-blue);
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        /* Curva Ondulada Inferior Estilizada Decorativa */
+        .bottom-wave-decorator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background: linear-gradient(135deg, var(--secondary-orange) 30%, var(--primary-blue) 30%);
+            z-index: 0;
+            display: none; /* Ativar se pretender a listra no limite do ecrã */
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
+    </style>
+</head>
+<body>
+
+    <!-- Bloco Superior Azul -->
+    <div class="top-hero-section">
+        <div class="welcome-text">
+            <h2>Olá!</h2>
+            <p>Faça login para continuar<br>no <span>ChamaJá</span></p>
+        </div>
+        <div class="mini-logo-box">
+            <!-- Coloque o caminho do seu logo real aqui (Ex: logo.png) -->
+            <img src="img/LOGO1.png" alt="Logo ChamaJá" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'%230A398A\'/><text x=\'50%\' y=\'55%\' fill=\'white\' font-weight=\'bold\' font-size=\'14\' text-anchor=\'middle\'>ChamaJá</text></svg>'">
+        </div>
+    </div>
+
+    <!-- Corpo Inferior de Conteúdo -->
+    <div class="content-body">
+        
+        <!-- Formulário Flutuante -->
+        <div class="login-card-floating">
+            <form onsubmit="handleLogin(event)">
+                
+                <div class="form-group">
+                    <label>Telefone ou E-mail</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input type="text" placeholder="Digite seu telefone ou e-mail" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 5px;">
+                    <label>Senha</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="passwordInput" placeholder="Digite sua senha" required>
+                        <i class="fa-regular fa-eye-slash toggle-password" onclick="togglePasswordVisibility()"></i>
+                    </div>
+                </div>
+
+               <a href="#" class="forgot-password-link" onclick="redirecionarRecuperacao(event)">Esqueceu sua senha?</a>
+
+                <button type="button" class="btn-orange-submit" onclick="fazerLogin()">Entrar</button>
+            </form>
+
+            <div class="divider-text">ou</div>
+
+            <!-- Botão Dinâmico Interligado à Seleção Inferior -->
+            <button type="button" class="btn-outline-register" onclick="redirecionarRegisto(event)">Criar conta</button>
+        </div>
+
+        <!-- Seletor "Entrar como" igual à imagem de referência -->
+        <div class="role-selector-section">
+    <p class="section-title">Entrar como</p>
+    <div class="role-grid-buttons">
+        
+        <div class="role-card-btn active" id="roleProfissional" data-role="profissional" onclick="setRole('profissional')">
+            <i class="fa-solid fa-helmet-safety"></i>
+            <span>Profissional</span>
+        </div>
+
+        <div class="role-card-btn" id="roleCliente" data-role="cliente" onclick="setRole('cliente')">
+            <i class="fa-solid fa-user"></i>
+            <span>Cliente</span>
+        </div>
+
+    </div>
+</div>
+
+
+    </div>
+
+    <script>
+        // Padrão definido de acordo com o destaque visual inicial
+        let papelSelecionado = 'profissional';
+
+        function setRole(role) {
+            papelSelecionado = role;
+            
+            const cardProfissional = document.getElementById('roleProfissional');
+            const cardCliente = document.getElementById('roleCliente');
+
+            if (role === 'profissional') {
+                cardProfissional.classList.add('active');
+                cardCliente.classList.remove('active');
+            } else {
+                cardCliente.classList.add('active');
+                cardProfissional.classList.remove('active');
+            }
+        }
+
+        function redirecionarRegisto(event) {
+            event.preventDefault();
+            if (papelSelecionado === 'cliente') {
+                window.location.href = 'criar-conta-cliente.html';
+            } else if (papelSelecionado === 'profissional') {
+                window.location.href = 'criar-conta-profissional.html';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('passwordInput');
+            const toggleIcon = document.querySelector('.toggle-password');
+            
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            } else {
+                passInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            alert('Autenticando sessão como: ' + papelSelecionado.toUpperCase());
+        }
+    </script>
+
+
+
+
+
+
+
+<!-- Função para abrir Recuperar Senha) -->
+<script>
+
+
+function redirecionarRecuperacao(event) {
+    event.preventDefault(); // Evita que a página recarregue ou salte para o topo
+
+    // Procura o card que está atualmente ativo na tela
+    const cardAtivo = document.querySelector('.role-card-btn.active');
+
+    if (cardAtivo) {
+        // Pega o valor do atributo 'data-role' ("profissional" ou "cliente")
+        const papelAtual = cardAtivo.getAttribute('data-role');
+
+        if (papelAtual === 'profissional') {
+            window.location.href = 'recuperar-senha-profissional.html';
+        } else {
+            window.location.href = 'recuperar-senha-cliente.html';
+        }
+    } else {
+        // Caso de segurança: se nada estiver ativo por falha, envia para o cliente
+        window.location.href = 'recuperar-senha-cliente.html';
+    }
+}
+
+
+</script>
+
+
+
+
+
+
+<!-- Função para abrir Recuperar Senha) -->
+<script>
+
+
+// Variável global para armazenar o papel selecionado por padrão (neste caso, profissional)
+let papelSelecionadoo = 'profissional';
+
+function setRole(role) {
+    // Atualiza a variável com o perfil clicado
+    papelSelecionado = role;
+
+    // Remove a classe 'active' de ambos os botões
+    document.getElementById('roleProfissional').classList.remove('active');
+    document.getElementById('roleCliente').classList.remove('active');
+
+    // Adiciona a classe 'active' apenas ao botão clicado
+    if (role === 'profissional') {
+        document.getElementById('roleProfissional').classList.add('active');
+    } else if (role === 'cliente') {
+        document.getElementById('roleCliente').classList.add('active');
+    }
+}
+
+function fazerLogin() {
+    // Redireciona de acordo com o perfil selecionado
+    if (papelSelecionado === 'cliente') {
+        window.location.href = 'home.html';
+    } else if (papelSelecionado === 'profissional') {
+        window.location.href = 'home-profissional.html';
+    }
+}
+
+
+</script>
+
+
+
+</body>
+</html>
