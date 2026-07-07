@@ -64,29 +64,37 @@
             display: flex; justify-content: center; align-items: center;
             font-size: 16px; cursor: pointer;
         }
-        .btn-search-trigger:active { background-color: #062459; }
 
-        /* Controlos do GPS e Botão de Foco */
+        /* Controlos do GPS e Botões Rápidos */
         .gps-row {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+            gap: 6px;
         }
 
         .gps-status {
             font-size: 12px; font-weight: 600; color: var(--text-gray);
-            display: flex; align-items: center; gap: 6px;
+            display: flex; align-items: center; gap: 6px; flex: 1;
         }
         .gps-status.hunting { color: var(--secondary-orange); }
         .gps-status.success { color: var(--success-green); }
+        .gps-status.error { color: var(--danger-red); }
 
-        .btn-locate-me {
+        .action-buttons-group {
+            display: flex; gap: 6px;
+        }
+
+        .btn-quick-action {
             background: white; border: 1px solid var(--border-color);
-            padding: 6px 12px; border-radius: 8px; font-size: 11px;
+            padding: 8px 12px; border-radius: 8px; font-size: 11px;
             font-weight: 700; color: var(--primary-blue); cursor: pointer;
             display: flex; align-items: center; gap: 4px;
         }
+        .btn-quick-action.orange-mode {
+            color: var(--secondary-orange);
+        }
 
         #map {
-            width: 100%; height: 220px; border-radius: 14px;
+            width: 100%; height: 200px; border-radius: 14px;
             border: 1px solid var(--border-color);
         }
 
@@ -127,12 +135,8 @@
         }
 
         .pro-left { display: flex; align-items: center; gap: 12px; }
-
         .pro-avatar-wrapper { position: relative; width: 56px; height: 56px; }
-
-        .pro-avatar-wrapper img {
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-        }
+        .pro-avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
         .online-dot {
             position: absolute; bottom: 2px; right: 2px;
@@ -153,9 +157,47 @@
             border-radius: 10px; padding: 10px 16px; font-size: 12px;
             font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(255, 138, 0, 0.2);
         }
-        .btn-solicitar:active { background-color: #E07A00; }
 
-        /* Estilos customizados para os Marcadores no Mapa */
+        /* --- ESTILOS DOS MODAIS CUSTOMIZADOS --- */
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 999;
+            display: none; justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .modal-card {
+            background: white; border-radius: 20px; padding: 24px;
+            width: 100%; max-width: 320px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-icon {
+            font-size: 32px; color: var(--primary-blue); margin-bottom: 12px;
+        }
+
+        .modal-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+        .modal-card p { font-size: 12px; color: var(--text-gray); line-height: 1.5; margin-bottom: 16px; }
+
+        .input-manual-group {
+            display: flex; flex-direction: column; gap: 10px; text-align: left; margin-bottom: 16px;
+        }
+        .input-manual-group label { font-size: 11px; font-weight: 700; color: var(--text-gray); }
+        .input-manual-group input {
+            width: 100%; height: 42px; background: var(--bg-light); border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 0 12px; font-size: 13px; font-weight: 600; outline: none;
+        }
+
+        .modal-actions { display: flex; flex-direction: column; gap: 8px; }
+        .btn-modal-primary {
+            width: 100%; height: 44px; background: var(--primary-blue); color: white;
+            border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
+        }
+        .btn-modal-cancel {
+            width: 100%; height: 44px; background: transparent; color: var(--text-gray);
+            border: none; font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+
+        /* Ícone customizado do Cliente com Ponto Vermelho */
         .client-marker-icon {
             position: relative; width: 40px; height: 40px;
         }
@@ -168,6 +210,9 @@
             position: absolute; top: 4px; left: 4px; width: 32px; height: 32px;
             border-radius: 50%; object-fit: cover; z-index: 2;
         }
+
+
+
 
 
 
@@ -209,15 +254,18 @@ body{
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="searchInput" placeholder="Pesquisar por profissão...">
             </div>
-            <button class="btn-search-trigger" onclick="executarPesquisaBotao()"><i class="fa-solid fa-arrow-right"></i></button>
+            <button class="btn-search-trigger" onclick="atualizarProcessamentoGeral()"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
 
         <div class="gps-row">
             <div class="gps-status hunting" id="gpsStatus">
                 <i class="fa-solid fa-location-crosshairs fa-spin"></i>
-                <span id="gpsStatusText">A obter GPS...</span>
+                <span id="gpsStatusText">A detetar coordenadas...</span>
             </div>
-            <button class="btn-locate-me" onclick="focarNoCliente()"><i class="fa-solid fa-crosshairs"></i> Onde estou?</button>
+            <div class="action-buttons-group">
+                <button class="btn-quick-action" onclick="abrirModalPermissao()"><i class="fa-solid fa-crosshairs"></i> Onde estou?</button>
+                <button class="btn-quick-action orange-mode" onclick="abrirModalManual()"><i class="fa-solid fa-map-pin"></i> Digitar Lat/Lng</button>
+            </div>
         </div>
 
         <div id="map"></div>
@@ -234,6 +282,36 @@ body{
         <div class="pro-list" id="proContainer"></div>
     </div>
 
+    <div class="modal-backdrop" id="modalPermission">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fa-solid fa-location-dot" style="color: var(--primary-blue)"></i></div>
+            <h3>Ativar Localização GPS</h3>
+            <p>Para mapear os profissionais mais próximos e calcular as distâncias exatas, o ChamaJá necessita de autorização para aceder ao GPS do teu telemóvel.</p>
+            <div class="modal-actions">
+                <button class="btn-modal-primary" onclick="concederPermissaoGPSReal()">Permitir Acesso</button>
+                <button class="btn-modal-cancel" onclick="fecharModais()">Agora Não</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modalManualInput">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fa-solid fa-keyboard" style="color: var(--secondary-orange)"></i></div>
+            <h3>Coordenadas Manuais</h3>
+            <p>Insira uma Latitude e Longitude fictícia ou real para testar o mapeamento e raio de alcance imediatamente.</p>
+            <div class="input-manual-group">
+                <label>Latitude</label>
+                <input type="number" step="any" id="manualLat" value="-8.8368">
+                <label>Longitude</label>
+                <input type="number" step="any" id="manualLng" value="13.2343">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal-primary" style="background: var(--secondary-orange);" onclick="aplicarCoordenadasManuais()">Definir Posição</button>
+                <button class="btn-modal-cancel" onclick="fecharModais()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
@@ -242,11 +320,9 @@ body{
         let markersGroup = [];
         let abaAtual = 'proximo';
 
-        // Foto simulada do cliente logado no app
         const FOTO_PERFIL_CLIENTE = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100";
 
-        // BASE DE DADOS FICTÍCIA EXPANDIDA (Pronta para Backend)
-        // Grupo A: Os 5 Iniciais do Cronograma
+        // 5 Fictícios Iniciais do Cronograma
         const grupoFicticiosFixos = [
             { id: 1, nome: "Enfermeiro João", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=100", avaliacao: "4.9", preco: 15000, latOff: 0.0045, lngOff: 0.0000 },
             { id: 2, nome: "Enfermeira Maria", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1594824813573-246434e3b96f?w=100", avaliacao: "4.8", preco: 18000, latOff: 0.0080, lngOff: 0.0020 },
@@ -255,7 +331,7 @@ body{
             { id: 5, nome: "Técnica Ana", profissao: "Técnico de AC", foto: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100", avaliacao: "4.6", preco: 12000, latOff: -0.0250, lngOff: 0.0100 }
         ];
 
-        // Grupo B: Mais 20 adicionais dinâmicos que vão andar no mapa
+        // Criação de 20 profissionais fictícios adicionais para movimento
         let profissionaisMoveis = [];
         const profissoesPool = ["Pedreiro", "Pintor", "Mecânico", "Jardineiro", "Estofador", "Carpinteiro", "Enfermeiro", "Eletricista"];
         const nomesPool = ["Manuel", "António", "Francisco", "José", "Mateus", "Lucas", "Marcos", "André", "Sebastião", "Paulo", "Teresa", "Cláudia", "Júlia", "Rosa", "Fátima"];
@@ -275,62 +351,96 @@ body{
             });
         }
 
-        // Junta tudo num array mestre controlado
         let todosProfissionais = [...grupoFicticiosFixos, ...profissionaisMoveis];
 
-        // --- INICIALIZAÇÃO ---
+        // Inicialização do Mapa com uma vista padrão de Luanda
         window.addEventListener('DOMContentLoaded', () => {
             map = L.map('map', { zoomControl: false }).setView([-8.8368, 13.2343], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             
-            iniciarGeolocalizacaoTempoReal();
-            iniciarSimulacaoMovimentoMapa();
-        });
-
-        function iniciarGeolocalizacaoTempoReal() {
-            if (!navigator.geolocation) return;
-            navigator.geolocation.watchPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                clientCoords = { lat, lng };
-
-                document.getElementById('gpsStatus').className = "gps-status success";
-                document.getElementById('gpsStatusText').textContent = "GPS Conectado em tempo real";
-
-                // Atualizar ou criar o Marcador Vermelho com a foto do Cliente
-                if (clientMarker) {
-                    clientMarker.setLatLng([lat, lng]);
-                } else {
-                    const clientIcon = L.divIcon({
-                        html: `<div class="client-marker-icon">
-                                <div class="pin-dot"></div>
-                                <img src="${FOTO_PERFIL_CLIENTE}">
-                               </div>`,
-                        className: '', iconSize: [40, 40], iconAnchor: [20, 20]
-                    });
-                    clientMarker = L.marker([lat, lng], { icon: clientIcon }).addTo(map);
-                    map.setView([lat, lng], 14);
-                }
-
-                atualizarProcessamentoGeral();
-            }, () => {
-                document.getElementById('gpsStatusText').textContent = "Falha ao ler GPS real.";
-            }, { enableHighAccuracy: true });
-        }
-
-        // Simula o movimento constante de 20 profissionais no mapa a cada 2 segundos
-        function iniciarSimulacaoMovimentoMapa() {
+            // Define uma posição inicial genérica para não quebrar a app no arranque
+            definirPosicaoClienteCentral(-8.8368, 13.2343, "Posição Padrão");
+            
+            // Loop de movimento dos profissionais adicionais
             setInterval(() => {
                 profissionaisMoveis.forEach(pro => {
                     pro.latOff += pro.direcaoLat;
                     pro.lngOff += pro.direcaoLng;
-
-                    // Mantém os profissionais dentro de um limite geográfico
                     if (Math.abs(pro.latOff) > 0.05) pro.direcaoLat *= -1;
                     if (Math.abs(pro.lngOff) > 0.05) pro.direcaoLng *= -1;
                 });
                 atualizarProcessamentoGeral();
             }, 2000);
+        });
+
+        // Controlo de Abertura dos Modais
+        function abrirModalPermissao() { document.getElementById('modalPermission').style.display = 'flex'; }
+        function abrirModalManual() { document.getElementById('modalManualInput').style.display = 'flex'; }
+        function fecharModais() {
+            document.getElementById('modalPermission').style.display = 'none';
+            document.getElementById('modalManualInput').style.display = 'none';
+        }
+
+        // Tenta forçar e aceder ao hardware do GPS Real após clique
+        function concederPermissaoGPSReal() {
+            fecharModais();
+            if (!navigator.geolocation) {
+                marcarFalhaGPS("Navegador sem suporte a GPS");
+                return;
+            }
+
+            document.getElementById('gpsStatusText').textContent = "A ler sensores...";
+
+            navigator.geolocation.getCurrentPosition((pos) => {
+                definirPosicaoClienteCentral(pos.coords.latitude, pos.coords.longitude, "GPS Ativo: Você está aqui");
+                document.getElementById('gpsStatus').className = "gps-status success";
+            }, (error) => {
+                console.error(error);
+                marcarFalhaGPS("Falha ao ler GPS real (Permissão ou Sinal)");
+            }, { enableHighAccuracy: true, timeout: 8000 });
+        }
+
+        // Define a localização manualmente via input do modal
+        function aplicarCoordenadasManuais() {
+            const lat = parseFloat(document.getElementById('manualLat').value);
+            const lng = parseFloat(document.getElementById('manualLng').value);
+            
+            if (isNaN(lat) || isNaN(lng)) {
+                alert("Insira valores numéricos válidos!");
+                return;
+            }
+
+            fecharModais();
+            definirPosicaoClienteCentral(lat, lng, "Coordenadas Manuais Definidas");
+            document.getElementById('gpsStatus').className = "gps-status success";
+        }
+
+        function marcarFalhaGPS(mensagem) {
+            document.getElementById('gpsStatus').className = "gps-status error";
+            document.getElementById('gpsStatusText').textContent = mensagem;
+            alert(mensagem + "\n\nDica: Utilize o botão laranja 'Digite Lat/Lng' para simular a sua localização manualmente se o telemóvel bloquear o GPS.");
+        }
+
+        // Atualiza a posição do ponto vermelho com foto de perfil e foca o mapa
+        function definirPosicaoClienteCentral(lat, lng, textoStatus) {
+            clientCoords = { lat, lng };
+            document.getElementById('gpsStatusText').textContent = textoStatus;
+
+            if (clientMarker) {
+                clientMarker.setLatLng([lat, lng]);
+            } else {
+                const clientIcon = L.divIcon({
+                    html: `<div class="client-marker-icon">
+                            <div class="pin-dot"></div>
+                            <img src="${FOTO_PERFIL_CLIENTE}">
+                           </div>`,
+                    className: '', iconSize: [40, 40], iconAnchor: [20, 20]
+                });
+                clientMarker = L.marker([lat, lng], { icon: clientIcon }).addTo(map);
+            }
+            
+            map.setView([lat, lng], 14);
+            atualizarProcessamentoGeral();
         }
 
         function calcularHaversine(lat1, lon1, lat2, lon2) {
@@ -343,23 +453,15 @@ body{
 
         function mudarAba(novaAba) {
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            if(novaAba === 'proximo') document.getElementById('tabProximo').classList.add('active');
-            if(novaAba === 'avaliado') document.getElementById('tabAvaliado').classList.add('active');
-            if(novaAba === 'barato') document.getElementById('tabBarato').classList.add('active');
-            
+            document.getElementById(`tab${novaAba.charAt(0).toUpperCase() + novaAba.slice(1)}`).classList.add('active');
             abaAtual = novaAba;
             atualizarProcessamentoGeral();
         }
 
-        function executarPesquisaBotao() {
-            atualizarProcessamentoGeral();
-        }
-
-        // Efetua os cálculos, atualiza o mapa e injeta os dados estruturados na UI
+        // Filtra, ordena e desenha os marcadores e os cards na UI móvel
         function atualizarProcessamentoGeral() {
             if (!clientCoords) return;
 
-            // Recalcula as distâncias e as coordenadas absolutas com base na posição real do utilizador
             todosProfissionais.forEach(pro => {
                 pro.latAbs = clientCoords.lat + pro.latOff;
                 pro.lngAbs = clientCoords.lng + pro.lngOff;
@@ -373,39 +475,34 @@ body{
                 listaFiltrada = listaFiltrada.filter(p => p.profissao.toLowerCase().includes(pesquisa) || p.nome.toLowerCase().includes(pesquisa));
             }
 
-            // APLICAÇÃO RÍGIDA DAS REGRAS DAS ABAS E VOLUMETRIA SOLICITADA
             let listaExibicao = [];
 
             if (abaAtual === 'avaliado') {
-                // Regra: Mostra os 2 bem mais avaliados
                 listaFiltrada.sort((a,b) => b.avaliacao - a.avaliacao);
                 listaExibicao = listaFiltrada.slice(0, 2);
                 document.getElementById('listHeaderTitle').textContent = `Os 2 Profissionais Mais Bem Avaliados`;
-                
-                // Atualizar Mapa com apenas os 2
                 renderizarMarcadoresNoMapa(listaExibicao);
             } 
             else if (abaAtual === 'barato') {
-                // Regra: Mostra outros 3 mais baratos
                 listaFiltrada.sort((a,b) => a.preco - b.preco);
                 listaExibicao = listaFiltrada.slice(0, 3);
                 document.getElementById('listHeaderTitle').textContent = `Os 3 Profissionais Mais Baratos da Região`;
-                
-                // Atualizar Mapa com apenas os 3
                 renderizarMarcadoresNoMapa(listaExibicao);
             } 
             else if (abaAtual === 'proximo') {
-                // Regra: Mostra os 5 fictícios iniciais ordenados por distância, mas garante a visibilidade dos 20 móveis no mapa
                 let fixosCalculados = [...grupoFicticiosFixos];
+                fixosCalculados.forEach(pro => {
+                    pro.latAbs = clientCoords.lat + pro.latOff;
+                    pro.lngAbs = clientCoords.lng + pro.lngOff;
+                    pro.distancia = calcularHaversine(clientCoords.lat, clientCoords.lng, pro.latAbs, pro.lngAbs);
+                });
                 fixosCalculados.sort((a,b) => a.distancia - b.distancia);
-                listaExibicao = fixosCalculados; // Exibe 5 cards
+                listaExibicao = fixosCalculados;
                 document.getElementById('listHeaderTitle').textContent = `Os 5 Profissionais Mais Próximos de Si`;
-
-                // Renderiza a totalidade dos elementos (Fixos + Móveis se movendo) no mapa
                 renderizarMarcadoresNoMapa(todosProfissionais);
             }
 
-            // Renderizar na Lista Visual (Sempre limitando a cards limpos com avaliação e botão solicitar)
+            // Injeção de Cards de Resultados
             const container = document.getElementById('proContainer');
             container.innerHTML = "";
 
@@ -435,16 +532,6 @@ body{
             });
         }
 
-        // Foca o mapa na localização em tempo real do Cliente com zoom máximo
-        function focarNoCliente() {
-            if (clientCoords) {
-                map.setView([clientCoords.lat, clientCoords.lng], 16);
-                if (clientMarker) clientMarker.openPopup();
-            } else {
-                alert("Aguardando coordenadas do GPS...");
-            }
-        }
-
         function renderizarMarcadoresNoMapa(lista) {
             markersGroup.forEach(m => map.removeLayer(m));
             markersGroup = [];
@@ -464,7 +551,6 @@ body{
             });
         }
 
-        // Redirecionamento explícito ao solicitar profissional
         function solicitarProfissional(id) {
             window.location.href = `perfil-profissional-no-cliente.html?id=${id}`;
         }
