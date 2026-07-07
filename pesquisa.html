@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ChamaJá - Resultados da Pesquisa</title>
+    <title>ChamaJá - Pesquisa Ativa de Profissionais</title>
     <!-- Font Awesome para os Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet.js CSS (OpenStreetMap) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
     <style>
         :root {
             --primary-blue: #0A398A;
-            --primary-dark: #062459;
             --secondary-orange: #FF8A00;
             --text-dark: #1E293B;
             --text-gray: #64748B;
             --bg-light: #F8FAFC;
             --border-color: #E2E8F0;
-            --star-gold: #FFB800;
             --success-green: #10B981;
         }
 
@@ -32,507 +33,406 @@
         body {
             background-color: var(--bg-light);
             color: var(--text-dark);
-            padding-bottom: 30px;
-        }
-
-        /* --- CABEÇALHO DE PESQUISA --- */
-        .search-header-container {
-            background-color: white;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .search-top-row {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 20px 10px 20px;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .back-btn {
-            color: var(--text-dark);
-            font-size: 18px;
-            text-decoration: none;
+        /* --- ZONA FIXA SUPERIOR: PESQUISA E MAPA --- */
+        .top-container {
+            background: white;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
         }
 
-        .search-input-wrapper {
-            flex: 1;
+        .search-wrapper {
             position: relative;
             display: flex;
             align-items: center;
+            margin-bottom: 12px;
         }
 
-        .search-input-wrapper i {
+        .search-wrapper i {
             position: absolute;
             left: 14px;
             color: var(--text-gray);
-            font-size: 14px;
+            font-size: 16px;
         }
 
-        .search-input-wrapper input {
+        .search-wrapper input {
             width: 100%;
+            height: 46px;
             background-color: var(--bg-light);
             border: 1px solid var(--border-color);
-            padding: 10px 14px 10px 40px;
             border-radius: 12px;
+            padding: 0 14px 0 44px;
             font-size: 14px;
             font-weight: 500;
-            color: var(--text-dark);
             outline: none;
         }
 
-        /* Chips de Filtro Rápido */
-        .filter-scroll-row {
-            display: flex;
-            gap: 8px;
-            padding: 4px 20px 12px 20px;
-            overflow-x: auto;
-        }
-
-        .filter-btn-chip {
-            white-space: nowrap;
-            background-color: white;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-gray);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .filter-btn-chip.active {
-            background-color: var(--primary-blue);
-            color: white;
+        .search-wrapper input:focus {
             border-color: var(--primary-blue);
         }
 
-        /* --- TEXTO DE RESULTADO --- */
-        .results-summary-text {
-            padding: 16px 20px 4px 20px;
-            font-size: 13px;
+        /* Estado do GPS */
+        .gps-status {
+            font-size: 12px;
+            font-weight: 600;
             color: var(--text-gray);
-            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .gps-status.hunting { color: var(--secondary-orange); }
+        .gps-status.success { color: var(--success-green); }
+
+        /* Contentor do Mapa (Fase 4) */
+        #map {
+            width: 100%;
+            height: 200px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
         }
 
-        /* --- LISTA DE PROFISSIONAIS --- */
-        .pro-list-results {
-            padding: 12px 20px;
+        /* --- PAINEL INFERIOR DESLIZANTE DE RESULTADOS --- */
+        .results-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background-color: var(--bg-light);
+        }
+
+        .results-header {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+
+        .pro-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
-        .pro-search-card {
-            background-color: white;
-            border-radius: 16px;
+        /* Cartão do Profissional (Fase 7) */
+        .pro-card {
+            background: white;
             border: 1px solid var(--border-color);
-            padding: 16px;
+            border-radius: 14px;
+            padding: 12px;
             display: flex;
-            gap: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.01);
-            cursor: pointer;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .pro-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pro-avatar-wrapper {
             position: relative;
+            width: 52px;
+            height: 52px;
         }
 
-        .pro-search-card:active {
-            background-color: #F8FAFC;
-        }
-
-        .pro-img-box {
-            position: relative;
-            width: 72px;
-            height: 72px;
-            flex-shrink: 0;
-        }
-
-        .pro-img-box img {
+        .pro-avatar-wrapper img {
             width: 100%;
             height: 100%;
-            border-radius: 14px;
+            border-radius: 50%;
             object-fit: cover;
         }
 
-        /* Ponto indicador de Online / Disponível */
-        .status-dot-online {
+        .online-dot {
             position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 14px;
-            height: 14px;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
             background-color: var(--success-green);
-            border: 2.5px solid white;
+            border: 2px solid white;
             border-radius: 50%;
         }
 
-        .pro-info-box {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .pro-info-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .pro-info-header h3 {
-            font-size: 15px;
+        .pro-meta h4 {
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-dark);
+            margin-bottom: 2px;
         }
 
-        .pro-rating {
-            display: flex;
-            align-items: center;
-            gap: 3px;
+        .pro-meta .job {
             font-size: 12px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .pro-rating i {
-            color: var(--star-gold);
-        }
-
-        .pro-sub-specialty {
-            font-size: 12px;
-            color: var(--text-gray);
             font-weight: 500;
+            color: var(--text-gray);
+            margin-bottom: 4px;
         }
 
-        /* Detalhes de localização e preço */
-        .pro-meta-data {
+        .pro-badges {
             display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 4px;
+            gap: 8px;
+            align-items: center;
             font-size: 11px;
             font-weight: 600;
-            color: var(--text-gray);
         }
 
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .meta-item i { font-size: 12px; }
+        .badge-star { color: #EAB308; }
+        .badge-distance { color: var(--primary-blue); background: #EFF6FF; padding: 2px 6px; border-radius: 6px; }
 
-        .meta-price {
-            color: var(--secondary-orange);
-        }
-
-        /* Botão interno de Favorito */
-        .card-fav-btn {
-            position: absolute;
-            bottom: 16px;
-            right: 16px;
-            background: none;
+        .btn-solicitar {
+            background-color: var(--secondary-orange);
+            color: white;
             border: none;
-            color: #CBD5E1;
-            font-size: 16px;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
+            box-shadow: 0 2px 6px rgba(255, 138, 0, 0.15);
+            white-space: nowrap;
         }
-        .card-fav-btn.active {
-            color: var(--secondary-orange);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /* ===== Configuração Global do Sistema ===== */
-
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Esconde a scrollbar */
-html,
-body{
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-html::-webkit-scrollbar,
-body::-webkit-scrollbar{
-    display: none;
-}
-
-/* Área segura do Android */
-body{
-    padding-top: max(40px, env(safe-area-inset-top));
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /* --- MENU INFERIOR FIXO --- */
-        .bottom-nav-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: 68px;
-            background-color: white;
-            border-top: 1px solid var(--border-color);
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            z-index: 200;
-        }
-
-        .nav-item-tab {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-gray);
-            text-decoration: none;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .nav-item-tab.active { color: var(--primary-blue); }
-        .nav-item-tab i { font-size: 18px; }
-
-                body {
-    /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
-    padding-bottom: 100px; 
-}
+        .btn-solicitar:active { background-color: #E07A00; }
     </style>
 </head>
 <body>
 
-    <!-- Cabeçalho Fixo com Input de Busca e Filtros -->
-    <div class="search-header-container">
-        <div class="search-top-row">
-            <a href="home.html" class="back-btn">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="mainSearchInput" value="Eletricista" placeholder="O que você precisa hoje?">
-            </div>
+    <!-- Zona Fixa Superior -->
+    <div class="top-container">
+        <!-- Input de Pesquisa Inteligente (Fase 6) -->
+        <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Pesquisar por Enfermeiro, Eletricista..." oninput="filtrarEPesquisar()">
         </div>
 
-        <!-- Scroll Horizontal de Filtros Rápidos -->
-        <div class="filter-scroll-row">
-            <button class="filter-btn-chip active" onclick="toggleFilterChip(this)">Melhor Avaliado</button>
-            <button class="filter-btn-chip" onclick="toggleFilterChip(this)">Mais Próximo</button>
-            <button class="filter-btn-chip" onclick="toggleFilterChip(this)">Menor Preço</button>
-            <button class="filter-btn-chip" onclick="toggleFilterChip(this)">Disponível Hoje</button>
+        <!-- Status do GPS em tempo real -->
+        <div class="gps-status hunting" id="gpsStatus">
+            <i class="fa-solid fa-location-crosshairs fa-spin"></i>
+            <span id="gpsStatusText">A obter autorização do GPS...</span>
         </div>
+
+        <!-- Elemento do Mapa Leaflet -->
+        <div id="map"></div>
     </div>
 
-    <!-- Indicador de quantidade de profissionais encontrados -->
-    <p class="results-summary-text">Encontrámos 3 profissionais disponíveis</p>
-
-    <!-- Lista de Resultados -->
-    <div class="pro-list-results">
+    <!-- Painel Inferior de Resultados (Fase 3 e 7) -->
+    <div class="results-container">
+        <div class="results-header" id="resultsCount">Profissionais mais próximos</div>
         
-        <!-- Profissional 1 -->
-        <div class="pro-search-card" onclick="openProfile()">
-            <div class="pro-img-box">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="António">
-                <div class="status-dot-online"></div>
-            </div>
-            <div class="pro-info-box">
-                <div class="pro-info-header">
-                    <h3>António Nzage</h3>
-                    <div class="pro-rating">
-                        <i class="fa-solid fa-star"></i>
-                        <span>4.9</span>
-                    </div>
-                </div>
-                <p class="pro-sub-specialty">Eletricista Geral • Redes Residenciais</p>
-                
-                <div class="pro-meta-data">
-                    <div class="meta-item"><i class="fa-solid fa-location-dot"></i> Maianga (1.2 km)</div>
-                    <div class="meta-item meta-price"><i class="fa-solid fa-wallet"></i> A partir de 5.000 Kz</div>
-                </div>
-            </div>
-            <button class="card-fav-btn active" onclick="toggleHeart(event, this)">
-                <i class="fa-solid fa-heart"></i>
-            </button>
+        <div class="pro-list" id="proListContainer">
+            <!-- Os cartões de profissionais serão injetados aqui dinamicamente pelo JavaScript -->
         </div>
-
-        <!-- Profissional 2 -->
-        <div class="pro-search-card" onclick="openProfile()">
-            <div class="pro-img-box">
-                <img src="https://images.unsplash.com/photo-1621905252507-b354bc25edac?w=150" alt="Carlos">
-                <div class="status-dot-online"></div>
-            </div>
-            <div class="pro-info-box">
-                <div class="pro-info-header">
-                    <h3>Carlos Manuel</h3>
-                    <div class="pro-rating">
-                        <i class="fa-solid fa-star"></i>
-                        <span>4.7</span>
-                    </div>
-                </div>
-                <p class="pro-sub-specialty">Instalações Industriais e Manutenção</p>
-                
-                <div class="pro-meta-data">
-                    <div class="meta-item"><i class="fa-solid fa-location-dot"></i> Talatona (4.5 km)</div>
-                    <div class="meta-item meta-price"><i class="fa-solid fa-wallet"></i> A partir de 7.500 Kz</div>
-                </div>
-            </div>
-            <button class="card-fav-btn" onclick="toggleHeart(event, this)">
-                <i class="fa-solid fa-heart"></i>
-            </button>
-        </div>
-
-        <!-- Profissional 3 -->
-        <div class="pro-search-card" onclick="openProfile()">
-            <div class="pro-img-box">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Mateus">
-            </div>
-            <div class="pro-info-box">
-                <div class="pro-info-header">
-                    <h3>Mateus Vemba</h3>
-                    <div class="pro-rating">
-                        <i class="fa-solid fa-star"></i>
-                        <span>4.5</span>
-                    </div>
-                </div>
-                <p class="pro-sub-specialty">Reparação de Eletrodomésticos</p>
-                
-                <div class="pro-meta-data">
-                    <div class="meta-item"><i class="fa-solid fa-location-dot"></i> Alvalade (2.0 km)</div>
-                    <div class="meta-item meta-price"><i class="fa-solid fa-wallet"></i> A partir de 4.000 Kz</div>
-                </div>
-            </div>
-            <button class="card-fav-btn" onclick="toggleHeart(event, this)">
-                <i class="fa-solid fa-heart"></i>
-            </button>
-        </div>
-
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     <!-- Menu de Navegação Inferior Profissional -->
-    <div class="bottom-nav-bar">
-        <a href="home.html" class="nav-item-tab">
-            <i class="fa-solid fa-chart-pie"></i>
-            <span>Home</span>
-        </a>
-        <a href="pesquisa.html" class="nav-item-tab active">
-            <i class="fa-solid fa-receipt"></i>
-            <span>Lista</span>
-        </a>
-        <a href="historico.html" class="nav-item-tab">
-            <i class="fa-solid fa-calendar-days"></i>
-            <span>Histórico</span>
-        </a>
-        <a href="chat.html" class="nav-item-tab">
-            <i class="fa-solid fa-message"></i>
-            <span>Chat</span>
-        </a>
-        <a href="perfil-cliente.html" class="nav-item-tab">
-            <i class="fa-solid fa-user-tie"></i>
-            <span>Perfil</span>
-        </a>
-    </div>
+    <!-- Leaflet.js Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // Alternar estado visual ativo nos botões de filtro rápido
-        function toggleFilterChip(button) {
-            button.classList.toggle('active');
+        // --- CONFIGURAÇÃO GLOBAL ---
+        let map, clientMarker;
+        let clientCoords = null;
+        let markersGroup = [];
+
+        // FASE 2: Base de dados fictícia de profissionais (Pronta para Backend)
+        // Coordenadas simuladas em torno de uma posição central inicial de Luanda
+        let profissionais = [
+            { id: 1, nome: "Enfermeiro João", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=100", avaliacao: "4.9", latOffset: 0.0045, lngOffset: 0.0000, status: "Online" }, // ~500m
+            { id: 2, nome: "Enfermeira Maria", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1594824813573-246434e3b96f?w=100", avaliacao: "4.8", latOffset: 0.0080, lngOffset: 0.0020, status: "Online" }, // ~900m
+            { id: 3, nome: "Eletricista Carlos", profissao: "Eletricista", foto: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100", avaliacao: "4.7", latOffset: -0.0090, lngOffset: -0.0010, status: "Online" }, // ~1km
+            { id: 4, nome: "Canalizador Pedro", profissao: "Canalizador", foto: "https://images.unsplash.com/photo-1621574539437-4b7cb63120b8?w=100", avaliacao: "4.5", latOffset: 0.0180, lngOffset: -0.0050, status: "Online" }, // ~2km
+            { id: 5, nome: "Técnica Ana", profissao: "Técnico de AC", foto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100", avaliacao: "4.9", latOffset: -0.0450, lngOffset: 0.0100, status: "Online" }   // ~5km
+        ];
+
+        // FASE 8: PREPARAÇÃO PARA O BACKEND
+        // No futuro, bastará substituir esta função por um fetch() para o teu ficheiro PHP
+        async function obterProfissionaisDoServidor() {
+            // Retorna a lista local atual (fictícia). Quando ligares ao MySQL, fazes a requisição aqui.
+            return profissionais;
         }
 
-        // Favoritar diretamente a partir do card sem abrir o perfil
-        function toggleHeart(event, button) {
-            event.stopPropagation(); // Evita abrir o perfil ao clicar no coração
-            button.classList.toggle('active');
-            
-            // Troca a classe do ícone para efeito preenchido/vazio
-            const icon = button.querySelector('i');
-            if(button.classList.contains('active')) {
-                icon.className = "fa-solid fa-heart";
-            } else {
-                icon.className = "fa-solid fa-heart";
+        // --- INICIALIZAÇÃO DA APLICAÇÃO ---
+        window.addEventListener('DOMContentLoaded', () => {
+            inicializarMapaPadrao();
+            capturarLocalizacaoCliente();
+        });
+
+        // Inicializa o mapa numa coordenada genérica de Luanda até obter o GPS real
+        function inicializarMapaPadrao() {
+            map = L.map('map', { zoomControl: false }).setView([-8.8368, 13.2343], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+        }
+
+        // FASE 1 & FASE 5: Capturar localização exata e atualização automática (WatchPosition)
+        function capturarLocalizacaoCliente() {
+            if (!navigator.geolocation) {
+                document.getElementById('gpsStatusText').textContent = "GPS não suportado no navegador.";
+                return;
             }
+
+            // watchPosition atualiza automaticamente a posição conforme a pessoa se move
+            navigator.geolocation.watchPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    clientCoords = { lat, lng };
+
+                    // Atualiza UI de status
+                    const statusDiv = document.getElementById('gpsStatus');
+                    statusDiv.className = "gps-status success";
+                    document.getElementById('gpsStatusText').textContent = "Localização ativa: Você está aqui";
+
+                    // Atualizar marcador do cliente no mapa
+                    if (clientMarker) {
+                        clientMarker.setLatLng([lat, lng]);
+                    } else {
+                        // Ícone customizado para o Cliente
+                        const clientIcon = L.divIcon({
+                            html: '<i class="fa-solid fa-circle-dot" style="color:#0A398A; font-size:18px; background:white; border-radius:50%; padding:2px; box-shadow:0 2px 6px rgba(0,0,0,0.3)"></i>',
+                            className: 'custom-div-icon',
+                            iconSize: [20, 20]
+                        });
+                        clientMarker = L.marker([lat, lng], { icon: clientIcon }).addTo(map).bindPopup("Você está aqui").openPopup();
+                    }
+
+                    // Centraliza o mapa no cliente gradualmente
+                    map.panTo([lat, lng]);
+
+                    // Processar e exibir os profissionais com base na nova posição
+                    processarEExibirDados();
+                },
+                (error) => {
+                    console.error("Erro ao aceder ao GPS:", error);
+                    document.getElementById('gpsStatusText').textContent = "Permissão negada ou falha no GPS.";
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
         }
 
-        // Navegar para a tela de perfil do profissional
-        function openProfile() {
-            window.location.href = 'perfil-profissional-no-cliente.html';
+        // FASE 3: Cálculo de Distância por Haversine
+        function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Raio da Terra em KM
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distância em Quilómetros
+        }
+
+        // Formatar distância de forma amigável
+        function formatarDistancia(km) {
+            if (km < 1) {
+                return `${Math.round(km * 1000)} m`;
+            }
+            return `${km.toFixed(1)} km`;
+        }
+
+        // Processa cálculo, ordenação e exibição de dados
+        async function processarEExibirDados() {
+            if (!clientCoords) return;
+
+            let listaPro = await obterProfissionaisDoServidor();
+            const termoPesquisa = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            // Atribui lat/lng real baseado no offset do cliente para que fiquem sempre próximos de onde estás a testar
+            listaPro.forEach(pro => {
+                pro.lat = clientCoords.lat + pro.latOffset;
+                pro.lng = clientCoords.lng + pro.lngOffset;
+                pro.distanciaReal = calcularDistanciaHaversine(clientCoords.lat, clientCoords.lng, pro.lat, pro.lng);
+            });
+
+            // FASE 3: Ordenar automaticamente do mais próximo para o mais distante
+            listaPro.sort((a, b) => a.distanciaReal - b.distanciaReal);
+
+            // FASE 6: Filtro de pesquisa inteligente (Termo e Status Online)
+            if (termoPesquisa !== "") {
+                listaPro = listaPro.filter(pro => 
+                    (pro.nome.toLowerCase().includes(termoPesquisa) || pro.profissao.toLowerCase().includes(termoPesquisa)) && pro.status === "Online"
+                );
+            }
+
+            renderizarMarcadoresNoMapa(listaPro);
+            renderizarListaCartoes(listaPro);
+        }
+
+        // FASE 4: Renderizar Marcadores no OpenStreetMap
+        function renderizarMarcadoresNoMapa(lista) {
+            // Limpa marcadores anteriores dos profissionais
+            markersGroup.forEach(m => map.removeLayer(m));
+            markersGroup = [];
+
+            lista.forEach(pro => {
+                const proIcon = L.divIcon({
+                    html: `<div style="background-color: var(--secondary-orange); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3)">
+                            <i class="fa-solid fa-user-tie" style="font-size:14px"></i>
+                           </div>`,
+                    className: 'custom-pro-icon',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                const m = L.marker([pro.lat, pro.lng], { icon: proIcon })
+                           .addTo(map)
+                           .bindPopup(`<b>${pro.nome}</b><br>${pro.profissao}<br>${formatarDistancia(pro.distanciaReal)}`);
+                markersGroup.push(m);
+            });
+        }
+
+        // FASE 7: Renderizar a Interface com os Cartões Profissionais
+        function renderizarListaCartoes(lista) {
+            const container = document.getElementById('proListContainer');
+            container.innerHTML = "";
+
+            if (lista.length === 0) {
+                container.innerHTML = `<p style="font-size:13px; color:var(--text-gray); text-align:center; padding:20px;">Nenhum profissional encontrado para este termo.</p>`;
+                return;
+            }
+
+            lista.forEach(pro => {
+                const card = document.createElement('div');
+                card.className = 'pro-card';
+                card.innerHTML = `
+                    <div class="pro-left">
+                        <div class="pro-avatar-wrapper">
+                            <img src="${pro.foto}" alt="${pro.nome}">
+                            <div class="online-dot"></div>
+                        </div>
+                        <div class="pro-meta">
+                            <h4>${pro.nome}</h4>
+                            <div class="job">${pro.profissao}</div>
+                            <div class="pro-badges">
+                                <span class="badge-star"><i class="fa-solid fa-star"></i> ${pro.avaliacao}</span>
+                                <span class="badge-distance"><i class="fa-solid fa-location-dot"></i> ${formatarDistancia(pro.distanciaReal)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-solicitar" onclick="solicitarServico('${pro.nome}')">Solicitar</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Listener da barra de pesquisa
+        function filtrarEPesquisar() {
+            processarEExibirDados();
+        }
+
+        // Ação do Botão Solicitar
+        function solicitarServico(nomePro) {
+            alert(`A iniciar processo de pedido direto para: ${nomePro}`);
+            // Redirecionamento futuro para ecrã de detalhes: window.location.href = `criar-pedido.html?pro=${encodeURIComponent(nomePro)}`;
         }
     </script>
-
-
-
-
-
-
-
-<script>
-
-
-window.addEventListener('DOMContentLoaded', () => {
-    // Captura os parâmetros da URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const termoBusca = urlParams.get('busca');
-
-    if (termoBusca) {
-        // Altera o valor do input de pesquisa para a profissão clicada
-        const inputPesquisa = document.getElementById('mainSearchInput');
-        if (inputPesquisa) {
-            inputPesquisa.value = termoBusca;
-        }
-        
-        // Aqui podes também chamar a tua função existente de filtrar os cards em tempo real
-        // Exemplo: filtrarListaProfissionais(termoBusca);
-    }
-});
-
-
-</script>
-
-
-
-
 </body>
 </html>
