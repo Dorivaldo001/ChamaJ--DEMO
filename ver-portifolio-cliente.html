@@ -312,6 +312,39 @@
     /* Se o teu menu tem 68px de altura, adiciona pelo menos 90px ou 100px de padding */
     padding-bottom: 100px; 
 }
+
+
+
+
+
+
+
+
+
+        /* ===== Configuração Global do Sistema ===== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Esconde a scrollbar */
+html,
+body{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+    display: none;
+}
+
+/* Área segura do Android */
+body{
+    padding-top: max(40px, env(safe-area-inset-top));
+}
     </style>
 </head>
 <body>
