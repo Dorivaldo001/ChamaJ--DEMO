@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ChamaJá - Pesquisa Ativa de Profissionais</title>
-    <!-- Font Awesome para os Ícones -->
+    <title>ChamaJá - Pesquisa Avançada</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Leaflet.js CSS (OpenStreetMap) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
@@ -20,12 +17,11 @@
             --bg-light: #F8FAFC;
             --border-color: #E2E8F0;
             --success-green: #10B981;
+            --danger-red: #EF4444;
         }
 
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0; padding: 0; box-sizing: border-box;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
@@ -33,373 +29,357 @@
         body {
             background-color: var(--bg-light);
             color: var(--text-dark);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
         }
 
-        /* --- ZONA FIXA SUPERIOR: PESQUISA E MAPA --- */
+        /* --- ZONA FIXA SUPERIOR --- */
         .top-container {
-            background: white;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            z-index: 10;
+            background: white; padding: 16px;
+            border-bottom: 1px solid var(--border-color); z-index: 10;
+        }
+
+        /* Barra de pesquisa com botão integrado */
+        .search-box-container {
+            display: flex; gap: 8px; margin-bottom: 12px;
         }
 
         .search-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
+            position: relative; flex: 1; display: flex; align-items: center;
         }
 
         .search-wrapper i {
-            position: absolute;
-            left: 14px;
-            color: var(--text-gray);
-            font-size: 16px;
+            position: absolute; left: 14px; color: var(--text-gray); font-size: 16px;
         }
 
         .search-wrapper input {
-            width: 100%;
-            height: 46px;
-            background-color: var(--bg-light);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0 14px 0 44px;
-            font-size: 14px;
-            font-weight: 500;
-            outline: none;
+            width: 100%; height: 48px; background-color: var(--bg-light);
+            border: 1px solid var(--border-color); border-radius: 12px;
+            padding: 0 14px 0 44px; font-size: 14px; font-weight: 500; outline: none;
         }
 
-        .search-wrapper input:focus {
-            border-color: var(--primary-blue);
+        .btn-search-trigger {
+            height: 48px; width: 48px; background-color: var(--primary-blue);
+            color: white; border: none; border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 16px; cursor: pointer;
+        }
+        .btn-search-trigger:active { background-color: #062459; }
+
+        /* Controlos do GPS e Botão de Foco */
+        .gps-row {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
         }
 
-        /* Estado do GPS */
         .gps-status {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-gray);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 8px;
+            font-size: 12px; font-weight: 600; color: var(--text-gray);
+            display: flex; align-items: center; gap: 6px;
         }
         .gps-status.hunting { color: var(--secondary-orange); }
         .gps-status.success { color: var(--success-green); }
 
-        /* Contentor do Mapa (Fase 4) */
+        .btn-locate-me {
+            background: white; border: 1px solid var(--border-color);
+            padding: 6px 12px; border-radius: 8px; font-size: 11px;
+            font-weight: 700; color: var(--primary-blue); cursor: pointer;
+            display: flex; align-items: center; gap: 4px;
+        }
+
         #map {
-            width: 100%;
-            height: 200px;
-            border-radius: 14px;
+            width: 100%; height: 220px; border-radius: 14px;
             border: 1px solid var(--border-color);
         }
 
-        /* --- PAINEL INFERIOR DESLIZANTE DE RESULTADOS --- */
+        /* --- FILTROS POR ABA (TABS) --- */
+        .tabs-container {
+            display: flex; gap: 8px; padding: 12px 16px 4px 16px;
+            background: white; border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-item {
+            flex: 1; background-color: var(--bg-light);
+            border: 1px solid var(--border-color); padding: 10px 0;
+            border-radius: 10px; font-size: 12px; font-weight: 700;
+            color: var(--text-gray); text-align: center; cursor: pointer; transition: all 0.2s;
+        }
+
+        .tab-item.active {
+            background-color: var(--primary-blue); color: white; border-color: var(--primary-blue);
+        }
+
+        /* --- CONTAINER DE RESULTADOS --- */
         .results-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            background-color: var(--bg-light);
+            flex: 1; overflow-y: auto; padding: 16px; background-color: var(--bg-light);
         }
 
         .results-header {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--text-dark);
+            font-size: 13px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 12px; color: var(--text-gray);
         }
 
-        .pro-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .pro-list { display: flex; flex-direction: column; gap: 12px; }
 
-        /* Cartão do Profissional (Fase 7) */
+        /* Estilo dos Cards */
         .pro-card {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            background: white; border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 14px; display: flex;
+            align-items: center; justify-content: space-between; gap: 12px;
         }
 
-        .pro-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .pro-left { display: flex; align-items: center; gap: 12px; }
 
-        .pro-avatar-wrapper {
-            position: relative;
-            width: 52px;
-            height: 52px;
-        }
+        .pro-avatar-wrapper { position: relative; width: 56px; height: 56px; }
 
         .pro-avatar-wrapper img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
         }
 
         .online-dot {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            background-color: var(--success-green);
-            border: 2px solid white;
-            border-radius: 50%;
+            position: absolute; bottom: 2px; right: 2px;
+            width: 12px; height: 12px; background-color: var(--success-green);
+            border: 2px solid white; border-radius: 50%;
         }
 
-        .pro-meta h4 {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 2px;
-        }
+        .pro-meta h4 { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+        .pro-meta .job { font-size: 12px; font-weight: 500; color: var(--text-gray); margin-bottom: 4px; }
 
-        .pro-meta .job {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-gray);
-            margin-bottom: 4px;
-        }
-
-        .pro-badges {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
+        .pro-badges { display: flex; gap: 6px; align-items: center; font-size: 11px; font-weight: 600; }
         .badge-star { color: #EAB308; }
         .badge-distance { color: var(--primary-blue); background: #EFF6FF; padding: 2px 6px; border-radius: 6px; }
+        .badge-price { color: var(--success-green); background: #ECFDF5; padding: 2px 6px; border-radius: 6px; }
 
         .btn-solicitar {
-            background-color: var(--secondary-orange);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 8px 14px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(255, 138, 0, 0.15);
-            white-space: nowrap;
+            background-color: var(--secondary-orange); color: white; border: none;
+            border-radius: 10px; padding: 10px 16px; font-size: 12px;
+            font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(255, 138, 0, 0.2);
         }
         .btn-solicitar:active { background-color: #E07A00; }
+
+        /* Estilos customizados para os Marcadores no Mapa */
+        .client-marker-icon {
+            position: relative; width: 40px; height: 40px;
+        }
+        .client-marker-icon .pin-dot {
+            position: absolute; width: 100%; height: 100%;
+            background: var(--danger-red); border: 3px solid white;
+            border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.4); z-index: 1;
+        }
+        .client-marker-icon img {
+            position: absolute; top: 4px; left: 4px; width: 32px; height: 32px;
+            border-radius: 50%; object-fit: cover; z-index: 2;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Zona Fixa Superior -->
     <div class="top-container">
-        <!-- Input de Pesquisa Inteligente (Fase 6) -->
-        <div class="search-wrapper">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="Pesquisar por Enfermeiro, Eletricista..." oninput="filtrarEPesquisar()">
+        <div class="search-box-container">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Pesquisar por profissão...">
+            </div>
+            <button class="btn-search-trigger" onclick="executarPesquisaBotao()"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
 
-        <!-- Status do GPS em tempo real -->
-        <div class="gps-status hunting" id="gpsStatus">
-            <i class="fa-solid fa-location-crosshairs fa-spin"></i>
-            <span id="gpsStatusText">A obter autorização do GPS...</span>
+        <div class="gps-row">
+            <div class="gps-status hunting" id="gpsStatus">
+                <i class="fa-solid fa-location-crosshairs fa-spin"></i>
+                <span id="gpsStatusText">A obter GPS...</span>
+            </div>
+            <button class="btn-locate-me" onclick="focarNoCliente()"><i class="fa-solid fa-crosshairs"></i> Onde estou?</button>
         </div>
 
-        <!-- Elemento do Mapa Leaflet -->
         <div id="map"></div>
     </div>
 
-    <!-- Painel Inferior de Resultados (Fase 3 e 7) -->
-    <div class="results-container">
-        <div class="results-header" id="resultsCount">Profissionais mais próximos</div>
-        
-        <div class="pro-list" id="proListContainer">
-            <!-- Os cartões de profissionais serão injetados aqui dinamicamente pelo JavaScript -->
-        </div>
+    <div class="tabs-container">
+        <div class="tab-item active" id="tabProximo" onclick="mudarAba('proximo')">Mais Próximo</div>
+        <div class="tab-item" id="tabAvaliado" onclick="mudarAba('avaliado')">Mais Avaliado</div>
+        <div class="tab-item" id="tabBarato" onclick="mudarAba('barato')">Mais Barato</div>
     </div>
 
-    <!-- Leaflet.js Script -->
+    <div class="results-container">
+        <div class="results-header" id="listHeaderTitle">Profissionais Disponíveis (10 encontrados)</div>
+        <div class="pro-list" id="proContainer"></div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // --- CONFIGURAÇÃO GLOBAL ---
         let map, clientMarker;
         let clientCoords = null;
         let markersGroup = [];
+        let abaAtual = 'proximo';
 
-        // FASE 2: Base de dados fictícia de profissionais (Pronta para Backend)
-        // Coordenadas simuladas em torno de uma posição central inicial de Luanda
-        let profissionais = [
-            { id: 1, nome: "Enfermeiro João", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=100", avaliacao: "4.9", latOffset: 0.0045, lngOffset: 0.0000, status: "Online" }, // ~500m
-            { id: 2, nome: "Enfermeira Maria", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1594824813573-246434e3b96f?w=100", avaliacao: "4.8", latOffset: 0.0080, lngOffset: 0.0020, status: "Online" }, // ~900m
-            { id: 3, nome: "Eletricista Carlos", profissao: "Eletricista", foto: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100", avaliacao: "4.7", latOffset: -0.0090, lngOffset: -0.0010, status: "Online" }, // ~1km
-            { id: 4, nome: "Canalizador Pedro", profissao: "Canalizador", foto: "https://images.unsplash.com/photo-1621574539437-4b7cb63120b8?w=100", avaliacao: "4.5", latOffset: 0.0180, lngOffset: -0.0050, status: "Online" }, // ~2km
-            { id: 5, nome: "Técnica Ana", profissao: "Técnico de AC", foto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100", avaliacao: "4.9", latOffset: -0.0450, lngOffset: 0.0100, status: "Online" }   // ~5km
+        // Foto simulada do cliente logado no app
+        const FOTO_PERFIL_CLIENTE = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100";
+
+        // BASE DE DADOS FICTÍCIA EXPANDIDA (Pronta para Backend)
+        // Grupo A: Os 5 Iniciais do Cronograma
+        const grupoFicticiosFixos = [
+            { id: 1, nome: "Enfermeiro João", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=100", avaliacao: "4.9", preco: 15000, latOff: 0.0045, lngOff: 0.0000 },
+            { id: 2, nome: "Enfermeira Maria", profissao: "Enfermeiro", foto: "https://images.unsplash.com/photo-1594824813573-246434e3b96f?w=100", avaliacao: "4.8", preco: 18000, latOff: 0.0080, lngOff: 0.0020 },
+            { id: 3, nome: "Eletricista Carlos", profissao: "Eletricista", foto: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=100", avaliacao: "4.7", preco: 9500, latOff: -0.0090, lngOff: -0.0010 },
+            { id: 4, nome: "Canalizador Pedro", profissao: "Canalizador", foto: "https://images.unsplash.com/photo-1621574539437-4b7cb63120b8?w=100", avaliacao: "4.5", preco: 7000, latOff: 0.0180, lngOff: -0.0050 },
+            { id: 5, nome: "Técnica Ana", profissao: "Técnico de AC", foto: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100", avaliacao: "4.6", preco: 12000, latOff: -0.0250, lngOff: 0.0100 }
         ];
 
-        // FASE 8: PREPARAÇÃO PARA O BACKEND
-        // No futuro, bastará substituir esta função por um fetch() para o teu ficheiro PHP
-        async function obterProfissionaisDoServidor() {
-            // Retorna a lista local atual (fictícia). Quando ligares ao MySQL, fazes a requisição aqui.
-            return profissionais;
+        // Grupo B: Mais 20 adicionais dinâmicos que vão andar no mapa
+        let profissionaisMoveis = [];
+        const profissoesPool = ["Pedreiro", "Pintor", "Mecânico", "Jardineiro", "Estofador", "Carpinteiro", "Enfermeiro", "Eletricista"];
+        const nomesPool = ["Manuel", "António", "Francisco", "José", "Mateus", "Lucas", "Marcos", "André", "Sebastião", "Paulo", "Teresa", "Cláudia", "Júlia", "Rosa", "Fátima"];
+
+        for (let i = 1; i <= 20; i++) {
+            profissionaisMoveis.push({
+                id: 10 + i,
+                nome: `Técnico ${nomesPool[i % nomesPool.length]} ${i}`,
+                profissao: profissoesPool[i % profissoesPool.length],
+                foto: `https://i.pravatar.cc/100?img=${i+10}`,
+                avaliacao: (4.0 + Math.random() * 1.0).toFixed(1),
+                preco: Math.round(5000 + Math.random() * 20000),
+                latOff: (Math.random() - 0.5) * 0.06,
+                lngOff: (Math.random() - 0.5) * 0.06,
+                direcaoLat: (Math.random() - 0.5) * 0.0005,
+                direcaoLng: (Math.random() - 0.5) * 0.0005
+            });
         }
 
-        // --- INICIALIZAÇÃO DA APLICAÇÃO ---
+        // Junta tudo num array mestre controlado
+        let todosProfissionais = [...grupoFicticiosFixos, ...profissionaisMoveis];
+
+        // --- INICIALIZAÇÃO ---
         window.addEventListener('DOMContentLoaded', () => {
-            inicializarMapaPadrao();
-            capturarLocalizacaoCliente();
+            map = L.map('map', { zoomControl: false }).setView([-8.8368, 13.2343], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            
+            iniciarGeolocalizacaoTempoReal();
+            iniciarSimulacaoMovimentoMapa();
         });
 
-        // Inicializa o mapa numa coordenada genérica de Luanda até obter o GPS real
-        function inicializarMapaPadrao() {
-            map = L.map('map', { zoomControl: false }).setView([-8.8368, 13.2343], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
+        function iniciarGeolocalizacaoTempoReal() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.watchPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                clientCoords = { lat, lng };
+
+                document.getElementById('gpsStatus').className = "gps-status success";
+                document.getElementById('gpsStatusText').textContent = "GPS Conectado em tempo real";
+
+                // Atualizar ou criar o Marcador Vermelho com a foto do Cliente
+                if (clientMarker) {
+                    clientMarker.setLatLng([lat, lng]);
+                } else {
+                    const clientIcon = L.divIcon({
+                        html: `<div class="client-marker-icon">
+                                <div class="pin-dot"></div>
+                                <img src="${FOTO_PERFIL_CLIENTE}">
+                               </div>`,
+                        className: '', iconSize: [40, 40], iconAnchor: [20, 20]
+                    });
+                    clientMarker = L.marker([lat, lng], { icon: clientIcon }).addTo(map);
+                    map.setView([lat, lng], 14);
+                }
+
+                atualizarProcessamentoGeral();
+            }, () => {
+                document.getElementById('gpsStatusText').textContent = "Falha ao ler GPS real.";
+            }, { enableHighAccuracy: true });
         }
 
-        // FASE 1 & FASE 5: Capturar localização exata e atualização automática (WatchPosition)
-        function capturarLocalizacaoCliente() {
-            if (!navigator.geolocation) {
-                document.getElementById('gpsStatusText').textContent = "GPS não suportado no navegador.";
-                return;
-            }
+        // Simula o movimento constante de 20 profissionais no mapa a cada 2 segundos
+        function iniciarSimulacaoMovimentoMapa() {
+            setInterval(() => {
+                profissionaisMoveis.forEach(pro => {
+                    pro.latOff += pro.direcaoLat;
+                    pro.lngOff += pro.direcaoLng;
 
-            // watchPosition atualiza automaticamente a posição conforme a pessoa se move
-            navigator.geolocation.watchPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    clientCoords = { lat, lng };
-
-                    // Atualiza UI de status
-                    const statusDiv = document.getElementById('gpsStatus');
-                    statusDiv.className = "gps-status success";
-                    document.getElementById('gpsStatusText').textContent = "Localização ativa: Você está aqui";
-
-                    // Atualizar marcador do cliente no mapa
-                    if (clientMarker) {
-                        clientMarker.setLatLng([lat, lng]);
-                    } else {
-                        // Ícone customizado para o Cliente
-                        const clientIcon = L.divIcon({
-                            html: '<i class="fa-solid fa-circle-dot" style="color:#0A398A; font-size:18px; background:white; border-radius:50%; padding:2px; box-shadow:0 2px 6px rgba(0,0,0,0.3)"></i>',
-                            className: 'custom-div-icon',
-                            iconSize: [20, 20]
-                        });
-                        clientMarker = L.marker([lat, lng], { icon: clientIcon }).addTo(map).bindPopup("Você está aqui").openPopup();
-                    }
-
-                    // Centraliza o mapa no cliente gradualmente
-                    map.panTo([lat, lng]);
-
-                    // Processar e exibir os profissionais com base na nova posição
-                    processarEExibirDados();
-                },
-                (error) => {
-                    console.error("Erro ao aceder ao GPS:", error);
-                    document.getElementById('gpsStatusText').textContent = "Permissão negada ou falha no GPS.";
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
+                    // Mantém os profissionais dentro de um limite geográfico
+                    if (Math.abs(pro.latOff) > 0.05) pro.direcaoLat *= -1;
+                    if (Math.abs(pro.lngOff) > 0.05) pro.direcaoLng *= -1;
+                });
+                atualizarProcessamentoGeral();
+            }, 2000);
         }
 
-        // FASE 3: Cálculo de Distância por Haversine
-        function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Raio da Terra em KM
+        function calcularHaversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = 
-                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; // Distância em Quilómetros
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        // Formatar distância de forma amigável
-        function formatarDistancia(km) {
-            if (km < 1) {
-                return `${Math.round(km * 1000)} m`;
-            }
-            return `${km.toFixed(1)} km`;
+        function mudarAba(novaAba) {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            if(novaAba === 'proximo') document.getElementById('tabProximo').classList.add('active');
+            if(novaAba === 'avaliado') document.getElementById('tabAvaliado').classList.add('active');
+            if(novaAba === 'barato') document.getElementById('tabBarato').classList.add('active');
+            
+            abaAtual = novaAba;
+            atualizarProcessamentoGeral();
         }
 
-        // Processa cálculo, ordenação e exibição de dados
-        async function processarEExibirDados() {
+        function executarPesquisaBotao() {
+            atualizarProcessamentoGeral();
+        }
+
+        // Efetua os cálculos, atualiza o mapa e injeta os dados estruturados na UI
+        function atualizarProcessamentoGeral() {
             if (!clientCoords) return;
 
-            let listaPro = await obterProfissionaisDoServidor();
-            const termoPesquisa = document.getElementById('searchInput').value.toLowerCase().trim();
-
-            // Atribui lat/lng real baseado no offset do cliente para que fiquem sempre próximos de onde estás a testar
-            listaPro.forEach(pro => {
-                pro.lat = clientCoords.lat + pro.latOffset;
-                pro.lng = clientCoords.lng + pro.lngOffset;
-                pro.distanciaReal = calcularDistanciaHaversine(clientCoords.lat, clientCoords.lng, pro.lat, pro.lng);
+            // Recalcula as distâncias e as coordenadas absolutas com base na posição real do utilizador
+            todosProfissionais.forEach(pro => {
+                pro.latAbs = clientCoords.lat + pro.latOff;
+                pro.lngAbs = clientCoords.lng + pro.lngOff;
+                pro.distancia = calcularHaversine(clientCoords.lat, clientCoords.lng, pro.latAbs, pro.lngAbs);
             });
 
-            // FASE 3: Ordenar automaticamente do mais próximo para o mais distante
-            listaPro.sort((a, b) => a.distanciaReal - b.distanciaReal);
+            let listaFiltrada = [...todosProfissionais];
+            const pesquisa = document.getElementById('searchInput').value.toLowerCase().trim();
 
-            // FASE 6: Filtro de pesquisa inteligente (Termo e Status Online)
-            if (termoPesquisa !== "") {
-                listaPro = listaPro.filter(pro => 
-                    (pro.nome.toLowerCase().includes(termoPesquisa) || pro.profissao.toLowerCase().includes(termoPesquisa)) && pro.status === "Online"
-                );
+            if (pesquisa !== "") {
+                listaFiltrada = listaFiltrada.filter(p => p.profissao.toLowerCase().includes(pesquisa) || p.nome.toLowerCase().includes(pesquisa));
             }
 
-            renderizarMarcadoresNoMapa(listaPro);
-            renderizarListaCartoes(listaPro);
-        }
+            // APLICAÇÃO RÍGIDA DAS REGRAS DAS ABAS E VOLUMETRIA SOLICITADA
+            let listaExibicao = [];
 
-        // FASE 4: Renderizar Marcadores no OpenStreetMap
-        function renderizarMarcadoresNoMapa(lista) {
-            // Limpa marcadores anteriores dos profissionais
-            markersGroup.forEach(m => map.removeLayer(m));
-            markersGroup = [];
+            if (abaAtual === 'avaliado') {
+                // Regra: Mostra os 2 bem mais avaliados
+                listaFiltrada.sort((a,b) => b.avaliacao - a.avaliacao);
+                listaExibicao = listaFiltrada.slice(0, 2);
+                document.getElementById('listHeaderTitle').textContent = `Os 2 Profissionais Mais Bem Avaliados`;
+                
+                // Atualizar Mapa com apenas os 2
+                renderizarMarcadoresNoMapa(listaExibicao);
+            } 
+            else if (abaAtual === 'barato') {
+                // Regra: Mostra outros 3 mais baratos
+                listaFiltrada.sort((a,b) => a.preco - b.preco);
+                listaExibicao = listaFiltrada.slice(0, 3);
+                document.getElementById('listHeaderTitle').textContent = `Os 3 Profissionais Mais Baratos da Região`;
+                
+                // Atualizar Mapa com apenas os 3
+                renderizarMarcadoresNoMapa(listaExibicao);
+            } 
+            else if (abaAtual === 'proximo') {
+                // Regra: Mostra os 5 fictícios iniciais ordenados por distância, mas garante a visibilidade dos 20 móveis no mapa
+                let fixosCalculados = [...grupoFicticiosFixos];
+                fixosCalculados.sort((a,b) => a.distancia - b.distancia);
+                listaExibicao = fixosCalculados; // Exibe 5 cards
+                document.getElementById('listHeaderTitle').textContent = `Os 5 Profissionais Mais Próximos de Si`;
 
-            lista.forEach(pro => {
-                const proIcon = L.divIcon({
-                    html: `<div style="background-color: var(--secondary-orange); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3)">
-                            <i class="fa-solid fa-user-tie" style="font-size:14px"></i>
-                           </div>`,
-                    className: 'custom-pro-icon',
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                });
+                // Renderiza a totalidade dos elementos (Fixos + Móveis se movendo) no mapa
+                renderizarMarcadoresNoMapa(todosProfissionais);
+            }
 
-                const m = L.marker([pro.lat, pro.lng], { icon: proIcon })
-                           .addTo(map)
-                           .bindPopup(`<b>${pro.nome}</b><br>${pro.profissao}<br>${formatarDistancia(pro.distanciaReal)}`);
-                markersGroup.push(m);
-            });
-        }
-
-        // FASE 7: Renderizar a Interface com os Cartões Profissionais
-        function renderizarListaCartoes(lista) {
-            const container = document.getElementById('proListContainer');
+            // Renderizar na Lista Visual (Sempre limitando a cards limpos com avaliação e botão solicitar)
+            const container = document.getElementById('proContainer');
             container.innerHTML = "";
 
-            if (lista.length === 0) {
-                container.innerHTML = `<p style="font-size:13px; color:var(--text-gray); text-align:center; padding:20px;">Nenhum profissional encontrado para este termo.</p>`;
-                return;
-            }
-
-            lista.forEach(pro => {
+            listaExibicao.forEach(pro => {
+                const distTxt = pro.distancia < 1 ? `${Math.round(pro.distancia * 1000)} m` : `${pro.distancia.toFixed(1)} km`;
                 const card = document.createElement('div');
                 card.className = 'pro-card';
                 card.innerHTML = `
@@ -413,25 +393,49 @@
                             <div class="job">${pro.profissao}</div>
                             <div class="pro-badges">
                                 <span class="badge-star"><i class="fa-solid fa-star"></i> ${pro.avaliacao}</span>
-                                <span class="badge-distance"><i class="fa-solid fa-location-dot"></i> ${formatarDistancia(pro.distanciaReal)}</span>
+                                <span class="badge-distance"><i class="fa-solid fa-location-dot"></i> ${distTxt}</span>
+                                <span class="badge-price">${pro.preco.toLocaleString()} Kz</span>
                             </div>
                         </div>
                     </div>
-                    <button class="btn-solicitar" onclick="solicitarServico('${pro.nome}')">Solicitar</button>
+                    <button class="btn-solicitar" onclick="solicitarProfissional(${pro.id})">Solicitar</button>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Listener da barra de pesquisa
-        function filtrarEPesquisar() {
-            processarEExibirDados();
+        // Foca o mapa na localização em tempo real do Cliente com zoom máximo
+        function focarNoCliente() {
+            if (clientCoords) {
+                map.setView([clientCoords.lat, clientCoords.lng], 16);
+                if (clientMarker) clientMarker.openPopup();
+            } else {
+                alert("Aguardando coordenadas do GPS...");
+            }
         }
 
-        // Ação do Botão Solicitar
-        function solicitarServico(nomePro) {
-            alert(`A iniciar processo de pedido direto para: ${nomePro}`);
-            // Redirecionamento futuro para ecrã de detalhes: window.location.href = `criar-pedido.html?pro=${encodeURIComponent(nomePro)}`;
+        function renderizarMarcadoresNoMapa(lista) {
+            markersGroup.forEach(m => map.removeLayer(m));
+            markersGroup = [];
+
+            lista.forEach(pro => {
+                const proIcon = L.divIcon({
+                    html: `<div style="background-color: var(--primary-blue); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3)">
+                            <i class="fa-solid fa-user-gear" style="font-size:12px"></i>
+                           </div>`,
+                    className: '', iconSize: [30, 30], iconAnchor: [15, 15]
+                });
+
+                const marker = L.marker([pro.latAbs, pro.lngAbs], { icon: proIcon })
+                                .addTo(map)
+                                .bindPopup(`<b>${pro.nome}</b><br>${pro.profissao}`);
+                markersGroup.push(marker);
+            });
+        }
+
+        // Redirecionamento explícito ao solicitar profissional
+        function solicitarProfissional(id) {
+            window.location.href = `perfil-profissional-no-cliente.html?id=${id}`;
         }
     </script>
 </body>
